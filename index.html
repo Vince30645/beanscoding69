@@ -429,6 +429,75 @@
             color: rgba(255, 255, 255, 0.6);
         }
 
+        /* Search Bar Styles */
+        .search-container {
+            margin: 2rem 0;
+            padding: 0 2rem;
+        }
+
+        .search-wrapper {
+            position: relative;
+            max-width: 500px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+        }
+
+        .search-input {
+            width: 100%;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 25px;
+            padding: 1rem 3rem 1rem 1.5rem;
+            color: white;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--matrix-green);
+            box-shadow: 0 0 20px rgba(0, 255, 65, 0.3);
+        }
+
+        .search-input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .search-icon {
+            position: absolute;
+            right: 3rem;
+            font-size: 1.2rem;
+            color: var(--matrix-green);
+            pointer-events: none;
+        }
+
+        .clear-search {
+            position: absolute;
+            right: 1rem;
+            background: none;
+            border: none;
+            color: var(--hot-pink);
+            cursor: pointer;
+            font-size: 1.2rem;
+            padding: 0.5rem;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .clear-search:hover {
+            background: rgba(255, 20, 147, 0.2);
+        }
+
+        .search-results-count {
+            text-align: center;
+            margin-top: 1rem;
+            color: var(--matrix-green);
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
         .tone-buttons {
             display: flex;
             gap: 1rem;
@@ -1114,6 +1183,16 @@
             <button class="category-btn" data-category="Custom">My Characters</button>
             <button class="cta-button" id="createCharacterBtn" style="margin-left: auto; padding: 0.6rem 1.2rem; font-size: 0.9rem;">+ Create Character</button>
         </nav>
+
+        <!-- Search Bar -->
+        <div class="search-container">
+            <div class="search-wrapper">
+                <input type="text" id="characterSearch" class="search-input" placeholder="Search characters..." autocomplete="off">
+                <div class="search-icon">🔍</div>
+                <button class="clear-search" id="clearSearch" style="display: none;">✕</button>
+            </div>
+            <div class="search-results-count" id="searchResultsCount"></div>
+        </div>
 
         <!-- Character Grid -->
         <div class="character-grid" id="characterGrid">
@@ -1808,6 +1887,7 @@
         let currentCategory = 'all';
         let selectedTone = 'sfw';
         let currentScenario = '';
+        let searchTerm = '';
         let customCharacters = JSON.parse(localStorage.getItem('customCharacters') || '[]');
         
         // Global dialogue tracking to prevent repetition across conversations
@@ -1853,6 +1933,7 @@
                     e.target.classList.add('active');
                     currentCategory = e.target.dataset.category;
                     renderCharacterGrid();
+                    updateSearchResults();
                 });
             });
 
@@ -1869,6 +1950,29 @@
             scenarioInput.addEventListener('input', (e) => {
                 currentScenario = e.target.value;
                 updateUI();
+            });
+
+            // Search functionality
+            const searchInput = document.getElementById('characterSearch');
+            const clearSearchBtn = document.getElementById('clearSearch');
+            
+            searchInput.addEventListener('input', (e) => {
+                searchTerm = e.target.value.toLowerCase().trim();
+                if (searchTerm) {
+                    clearSearchBtn.style.display = 'block';
+                } else {
+                    clearSearchBtn.style.display = 'none';
+                }
+                renderCharacterGrid();
+                updateSearchResults();
+            });
+
+            clearSearchBtn.addEventListener('click', () => {
+                searchInput.value = '';
+                searchTerm = '';
+                clearSearchBtn.style.display = 'none';
+                renderCharacterGrid();
+                updateSearchResults();
             });
 
             // Start conversation button
@@ -1913,6 +2017,17 @@
                 : currentCategory === 'Custom'
                     ? customCharacters
                     : allCharacters.filter(char => char.category === currentCategory);
+            
+            // Apply search filter
+            if (searchTerm) {
+                filteredCharacters = filteredCharacters.filter(char => {
+                    const nameMatch = char.name.toLowerCase().includes(searchTerm);
+                    const descriptionMatch = char.description.toLowerCase().includes(searchTerm);
+                    const traitMatch = char.traits.some(trait => trait.toLowerCase().includes(searchTerm));
+                    const categoryMatch = char.category.toLowerCase().includes(searchTerm);
+                    return nameMatch || descriptionMatch || traitMatch || categoryMatch;
+                });
+            }
             
             // Sort characters alphabetically by name
             filteredCharacters = filteredCharacters.sort((a, b) => a.name.localeCompare(b.name));
@@ -2757,6 +2872,35 @@ Start the conversation now!
                 renderCharacterGrid();
                 updateSelectedPanel();
                 updateUI();
+            }
+        }
+
+        function updateSearchResults() {
+            const resultsCountElement = document.getElementById('searchResultsCount');
+            const allCharacters = [...characters, ...customCharacters];
+            
+            let filteredCharacters = currentCategory === 'all' 
+                ? allCharacters 
+                : currentCategory === 'Custom'
+                    ? customCharacters
+                    : allCharacters.filter(char => char.category === currentCategory);
+            
+            if (searchTerm) {
+                filteredCharacters = filteredCharacters.filter(char => {
+                    const nameMatch = char.name.toLowerCase().includes(searchTerm);
+                    const descriptionMatch = char.description.toLowerCase().includes(searchTerm);
+                    const traitMatch = char.traits.some(trait => trait.toLowerCase().includes(searchTerm));
+                    const categoryMatch = char.category.toLowerCase().includes(searchTerm);
+                    return nameMatch || descriptionMatch || traitMatch || categoryMatch;
+                });
+                
+                const resultText = filteredCharacters.length === 1 
+                    ? `${filteredCharacters.length} character found`
+                    : `${filteredCharacters.length} characters found`;
+                resultsCountElement.textContent = resultText;
+                resultsCountElement.style.display = 'block';
+            } else {
+                resultsCountElement.style.display = 'none';
             }
         }
 
