@@ -1,0 +1,2788 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eaves - Character Interactions Reimagined</title>
+    <style>
+        /* SPIDER-VERSE THEME CSS */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --matrix-green: #00ff41;
+            --hot-pink: #ff1493;
+            --electric-blue: #00bfff;
+            --deep-black: #0a0a0a;
+            --dark-purple-grey: #2e2e3e;
+            --glass-bg: rgba(46, 46, 62, 0.3);
+            --glass-border: rgba(0, 255, 65, 0.4);
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, var(--deep-black), var(--dark-purple-grey), var(--deep-black));
+            background-size: 400% 400%;
+            animation: gradientShift 8s ease infinite;
+            min-height: 100vh;
+            color: white;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Floating Dots Background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(2px 2px at 20px 30px, var(--matrix-green), transparent),
+                radial-gradient(2px 2px at 40px 70px, var(--hot-pink), transparent),
+                radial-gradient(1px 1px at 90px 40px, var(--matrix-green), transparent),
+                radial-gradient(1px 1px at 130px 80px, var(--hot-pink), transparent),
+                radial-gradient(2px 2px at 160px 30px, var(--matrix-green), transparent);
+            background-repeat: repeat;
+            background-size: 200px 100px;
+            animation: floatDots 20s linear infinite;
+            opacity: 0.3;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        @keyframes floatDots {
+            0% { transform: translateY(0px); }
+            100% { transform: translateY(-200px); }
+        }
+
+        /* Header */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: rgba(10, 10, 10, 0.9);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--glass-border);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 2rem;
+            font-weight: 900;
+            background: linear-gradient(45deg, var(--hot-pink), var(--matrix-green));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 20px rgba(255, 20, 147, 0.5);
+        }
+
+        .tagline {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            margin-left: 1rem;
+        }
+
+        .selection-counter {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            background: var(--glass-bg);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(10px);
+        }
+
+        .counter-text {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .counter-number {
+            background: linear-gradient(45deg, var(--hot-pink), var(--matrix-green));
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-weight: 700;
+            min-width: 30px;
+            text-align: center;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-top: 100px;
+            padding: 2rem;
+            position: relative;
+            z-index: 10;
+        }
+
+        .intro-section {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .main-title {
+            font-size: 3rem;
+            font-weight: 900;
+            margin-bottom: 1rem;
+            background: linear-gradient(45deg, var(--hot-pink), var(--matrix-green), var(--hot-pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 30px rgba(255, 20, 147, 0.3);
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.8;
+            margin-bottom: 2rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            line-height: 1.6;
+        }
+
+        .cta-button {
+            background: linear-gradient(45deg, var(--hot-pink), var(--matrix-green));
+            border: none;
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(255, 20, 147, 0.4);
+            margin-bottom: 3rem;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(255, 20, 147, 0.6);
+        }
+
+        /* Character Categories */
+        .categories-nav {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .category-btn {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            font-weight: 600;
+        }
+
+        .category-btn:hover,
+        .category-btn.active {
+            background: linear-gradient(45deg, var(--hot-pink), var(--matrix-green));
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(255, 20, 147, 0.3);
+        }
+
+        /* Character Grid */
+        .character-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+            max-height: 70vh;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+
+        .character-grid::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .character-grid::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+        }
+
+        .character-grid::-webkit-scrollbar-thumb {
+            background: linear-gradient(45deg, var(--hot-pink), var(--matrix-green));
+            border-radius: 4px;
+        }
+
+        .character-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 1.5rem;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            backdrop-filter: blur(15px);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .character-image {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 1rem;
+            border: 3px solid var(--glass-border);
+            transition: all 0.3s ease;
+            position: relative;
+            z-index: 1;
+        }
+
+        .character-card:hover .character-image {
+            border-color: var(--matrix-green);
+            box-shadow: 0 0 20px rgba(0, 255, 65, 0.4);
+            transform: scale(1.1);
+        }
+
+        .character-card.selected .character-image {
+            border-color: var(--hot-pink);
+            box-shadow: 0 0 25px rgba(255, 20, 147, 0.6);
+        }
+
+        .character-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, var(--hot-pink), var(--matrix-green));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: -1;
+        }
+
+        .character-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(255, 20, 147, 0.3);
+        }
+
+        .character-card:hover::before {
+            opacity: 0.1;
+        }
+
+        .character-card.selected {
+            background: rgba(255, 20, 147, 0.2);
+            border: 2px solid var(--hot-pink);
+            box-shadow: 0 0 30px rgba(255, 20, 147, 0.5);
+        }
+
+        .character-card.selected::before {
+            opacity: 0.15;
+        }
+
+        .character-name {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: var(--matrix-green);
+        }
+
+        .character-description {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            margin-bottom: 1rem;
+            line-height: 1.4;
+        }
+
+        .character-traits {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .trait-tag {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 0.2rem 0.6rem;
+            border-radius: 10px;
+            font-size: 0.75rem;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .character-phrase {
+            font-style: italic;
+            opacity: 0.7;
+            font-size: 0.8rem;
+            border-left: 2px solid var(--hot-pink);
+            padding-left: 0.8rem;
+            margin-top: 1rem;
+        }
+
+        /* Selected Characters Panel */
+        .selected-panel {
+            position: fixed;
+            right: -400px;
+            top: 100px;
+            bottom: 20px;
+            width: 350px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px 0 0 20px;
+            padding: 2rem;
+            transition: right 0.4s ease;
+            z-index: 500;
+            overflow-y: auto;
+        }
+
+        .selected-panel.active {
+            right: 0;
+        }
+
+        .panel-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--matrix-green);
+            text-align: center;
+        }
+
+        .selected-character-item {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border: 1px solid var(--glass-border);
+        }
+
+        .selected-char-name {
+            font-weight: 600;
+            color: var(--hot-pink);
+            margin-bottom: 0.5rem;
+        }
+
+        .selected-char-desc {
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+
+        .remove-btn {
+            background: rgba(255, 0, 0, 0.3);
+            border: none;
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 10px;
+            cursor: pointer;
+            float: right;
+            font-size: 0.7rem;
+            margin-top: 0.5rem;
+        }
+
+        /* Scenario Section */
+        .scenario-section {
+            margin: 2rem 0;
+            padding: 1.5rem;
+            background: var(--glass-bg);
+            border-radius: 15px;
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(10px);
+        }
+
+        .scenario-title {
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--matrix-green);
+        }
+
+        .scenario-input {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--glass-border);
+            border-radius: 10px;
+            padding: 0.8rem;
+            color: white;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .scenario-input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .tone-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .tone-btn {
+            flex: 1;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            color: white;
+            padding: 0.8rem;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .tone-btn.active {
+            background: linear-gradient(45deg, var(--hot-pink), var(--matrix-green));
+        }
+
+        /* Start Conversation Button */
+        .start-conversation-btn {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) scale(0);
+            background: linear-gradient(45deg, var(--hot-pink), var(--matrix-green));
+            border: none;
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            box-shadow: 0 10px 30px rgba(255, 20, 147, 0.4);
+            z-index: 1001;
+        }
+
+        .start-conversation-btn.active {
+            transform: translateX(-50%) scale(1);
+        }
+
+        .start-conversation-btn:hover {
+            transform: translateX(-50%) scale(1.05);
+            box-shadow: 0 15px 40px rgba(255, 20, 147, 0.6);
+        }
+
+        /* Conversation View */
+        .conversation-view {
+            display: none;
+            padding: 2rem;
+            margin-top: 100px;
+        }
+
+        .conversation-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .conversation-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            background: linear-gradient(45deg, var(--hot-pink), var(--matrix-green));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .conversation-participants {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .participant {
+            background: var(--glass-bg);
+            padding: 1rem;
+            border-radius: 15px;
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(10px);
+        }
+
+        .conversation-content {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 2rem;
+            backdrop-filter: blur(15px);
+            max-height: 60vh;
+            overflow-y: auto;
+        }
+
+        .dialogue-message {
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            border-radius: 15px;
+            animation: fadeInUp 0.6s ease;
+        }
+
+        .dialogue-message:nth-child(odd) {
+            background: rgba(255, 20, 147, 0.1);
+            border-left: 4px solid var(--hot-pink);
+        }
+
+        .dialogue-message:nth-child(even) {
+            background: rgba(0, 255, 65, 0.1);
+            border-left: 4px solid var(--matrix-green);
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .speaker-name {
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: var(--matrix-green);
+        }
+
+        .dialogue-text {
+            line-height: 1.6;
+            opacity: 0.9;
+        }
+
+        .conversation-controls {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .control-btn {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .control-btn:hover {
+            background: linear-gradient(45deg, var(--hot-pink), var(--matrix-green));
+            transform: translateY(-2px);
+        }
+
+        /* Payment Popup Modal */
+        .payment-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 2000;
+            backdrop-filter: blur(10px);
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .payment-modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(135deg, var(--deep-black), var(--dark-purple-grey));
+            border: 1px solid var(--glass-border);
+            border-radius: 25px;
+            padding: 3rem;
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.3);
+            animation: slideUp 0.4s ease;
+        }
+
+        @keyframes slideUp {
+            from { 
+                opacity: 0;
+                transform: translate(-50%, -40%);
+            }
+            to { 
+                opacity: 1;
+                transform: translate(-50%, -50%);
+            }
+        }
+
+        .payment-modal h2 {
+            color: white;
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            background: linear-gradient(45deg, var(--hot-pink), var(--matrix-green));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .payment-modal p {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1rem;
+            line-height: 1.6;
+            margin-bottom: 2rem;
+        }
+
+        .pricing-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .pricing-card {
+            background: var(--glass-bg);
+            border: 2px solid var(--glass-border);
+            border-radius: 15px;
+            padding: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .pricing-card:hover {
+            border-color: var(--hot-pink);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(255, 20, 147, 0.3);
+        }
+
+        .pricing-card.selected {
+            border-color: var(--matrix-green);
+            background: rgba(0, 255, 65, 0.1);
+            box-shadow: 0 0 20px rgba(0, 255, 65, 0.3);
+        }
+
+        .pricing-card h3 {
+            color: var(--matrix-green);
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .pricing-card .price {
+            color: white;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .pricing-card .description {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.85rem;
+        }
+
+        .payment-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .stripe-pay-btn {
+            background: linear-gradient(45deg, var(--hot-pink), var(--matrix-green));
+            border: none;
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 15px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .stripe-pay-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(255, 20, 147, 0.4);
+        }
+
+        .stripe-pay-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .close-payment-modal {
+            background: transparent;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            color: rgba(255, 255, 255, 0.8);
+            padding: 0.8rem 1.5rem;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .close-payment-modal:hover {
+            border-color: rgba(255, 255, 255, 0.6);
+            color: white;
+        }
+
+        .stripe-icon {
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 3px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #635bff;
+            font-size: 0.7rem;
+        }
+
+        /* Loading Animation */
+        .loading-animation {
+            display: none;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .loading-dots {
+            display: inline-block;
+        }
+
+        .loading-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--hot-pink);
+            margin: 0 2px;
+            animation: loadingBounce 1.4s ease-in-out infinite both;
+        }
+
+        .loading-dot:nth-child(1) { animation-delay: -0.32s; }
+        .loading-dot:nth-child(2) { animation-delay: -0.16s; }
+        .loading-dot:nth-child(3) { animation-delay: 0; }
+
+        @keyframes loadingBounce {
+            0%, 80%, 100% {
+                transform: scale(0);
+            }
+            40% {
+                transform: scale(1);
+            }
+        }
+
+        /* Character Creation Modal */
+        .character-creation-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 2000;
+            backdrop-filter: blur(10px);
+            animation: fadeIn 0.3s ease;
+            overflow-y: auto;
+            padding: 2rem;
+        }
+
+        .character-creation-content {
+            position: relative;
+            background: linear-gradient(135deg, var(--deep-black), var(--dark-purple-grey));
+            border: 1px solid var(--glass-border);
+            border-radius: 25px;
+            padding: 2rem;
+            max-width: 600px;
+            width: 100%;
+            margin: 0 auto;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.3);
+            animation: slideUp 0.4s ease;
+        }
+
+        .character-creation-content h2 {
+            color: white;
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(45deg, var(--hot-pink), var(--matrix-green));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-align: center;
+        }
+
+        .character-creation-content p {
+            color: rgba(255, 255, 255, 0.8);
+            text-align: center;
+            margin-bottom: 2rem;
+            font-size: 1rem;
+        }
+
+        .character-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .form-group label {
+            color: var(--matrix-green);
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            background: rgba(46, 46, 62, 0.4);
+            border: 1px solid var(--glass-border);
+            border-radius: 10px;
+            padding: 0.8rem;
+            color: white;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--matrix-green);
+            box-shadow: 0 0 10px rgba(0, 255, 65, 0.3);
+        }
+
+        .form-group input::placeholder,
+        .form-group textarea::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .form-group small {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.75rem;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .form-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .create-char-btn {
+            flex: 1;
+            background: linear-gradient(45deg, var(--hot-pink), var(--matrix-green));
+            border: none;
+            color: white;
+            padding: 1rem;
+            border-radius: 15px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .create-char-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(255, 20, 147, 0.4);
+        }
+
+        .create-char-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .cancel-char-btn {
+            flex: 1;
+            background: transparent;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            color: rgba(255, 255, 255, 0.8);
+            padding: 1rem;
+            border-radius: 15px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .cancel-char-btn:hover {
+            border-color: rgba(255, 255, 255, 0.6);
+            color: white;
+        }
+
+        /* Character card styling for custom characters */
+        .character-card.custom-character {
+            border: 2px solid var(--matrix-green);
+            background: linear-gradient(135deg, rgba(0, 255, 65, 0.1), var(--glass-bg));
+        }
+
+        .character-card.custom-character .character-name {
+            color: var(--matrix-green);
+            position: relative;
+        }
+
+        .character-card.custom-character .character-name::after {
+            content: "✨";
+            position: absolute;
+            right: -20px;
+            top: 0;
+            font-size: 0.8em;
+        }
+
+        .custom-character-placeholder {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--hot-pink), var(--matrix-green));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            font-weight: bold;
+            color: white;
+            margin-bottom: 1rem;
+            border: 3px solid var(--glass-border);
+        }
+
+        .remove-custom-char {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(255, 0, 0, 0.7);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 25px;
+            height: 25px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            opacity: 0;
+        }
+
+        .character-card.custom-character:hover .remove-custom-char {
+            opacity: 1;
+        }
+
+        .remove-custom-char:hover {
+            background: rgba(255, 0, 0, 1);
+            transform: scale(1.1);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .header {
+                padding: 1rem;
+            }
+
+            .logo {
+                font-size: 1.5rem;
+            }
+
+            .tagline {
+                display: none;
+            }
+
+            .main-title {
+                font-size: 2rem;
+            }
+
+            .cta-button {
+                padding: 0.8rem 1.5rem;
+                font-size: 1rem;
+            }
+
+            .character-grid {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+                gap: 1rem;
+            }
+
+            .character-image {
+                width: 60px;
+                height: 60px;
+            }
+
+            .character-card {
+                padding: 1rem;
+            }
+
+            .selected-panel {
+                width: 300px;
+                right: -300px;
+            }
+
+            .conversation-participants {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            /* Payment Modal Mobile Styles */
+            .payment-modal-content {
+                padding: 2rem;
+                margin: 1rem;
+                max-width: calc(100vw - 2rem);
+                width: calc(100vw - 2rem);
+            }
+
+            .pricing-options {
+                grid-template-columns: 1fr;
+                gap: 0.75rem;
+            }
+
+            .pricing-card {
+                padding: 1rem;
+            }
+
+            .payment-modal h2 {
+                font-size: 1.4rem;
+            }
+
+            .stripe-pay-btn {
+                padding: 0.8rem 1.5rem;
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div style="display: flex; align-items: center;">
+            <div class="logo">Eaves</div>
+            <div class="tagline">Character Interactions Reimagined</div>
+        </div>
+        <div class="selection-counter">
+            <span class="counter-text">Selected:</span>
+            <div class="counter-number" id="selectionCount">0</div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content" id="mainContent">
+        <div class="intro-section">
+            <h1 class="main-title">Legends Don't Just Live in Stories Anymore.</h1>
+            <p class="subtitle">
+                They talk, they argue, they team up—exactly how you'd expect… or maybe not.
+            </p>
+            <button class="cta-button" onclick="document.querySelector('.character-grid').scrollIntoView({behavior: 'smooth'})">
+                See It Happen
+            </button>
+        </div>
+
+        <!-- Category Navigation -->
+        <nav class="categories-nav">
+            <button class="category-btn active" data-category="all">All Characters</button>
+            <button class="category-btn" data-category="Superheroes">Superheroes</button>
+            <button class="category-btn" data-category="Athletes">Athletes</button>
+            <button class="category-btn" data-category="Anime">Anime</button>
+            <button class="category-btn" data-category="Musicians">Musicians</button>
+            <button class="category-btn" data-category="Villains">Villains</button>
+            <button class="category-btn" data-category="Custom">My Characters</button>
+            <button class="cta-button" id="createCharacterBtn" style="margin-left: auto; padding: 0.6rem 1.2rem; font-size: 0.9rem;">+ Create Character</button>
+        </nav>
+
+        <!-- Character Grid -->
+        <div class="character-grid" id="characterGrid">
+            <!-- Characters will be populated by JavaScript -->
+        </div>
+    </main>
+
+    <!-- Selected Characters Panel -->
+    <div class="selected-panel" id="selectedPanel">
+        <h3 class="panel-title">Selected Characters</h3>
+        <div id="selectedCharactersList"></div>
+        
+        <div class="scenario-section">
+            <div class="scenario-title">Scenario</div>
+            <input type="text" class="scenario-input" id="scenarioInput" 
+                   placeholder="Describe the setting... (e.g., 'meeting at a coffee shop')">
+            
+            <div class="tone-buttons">
+                <button class="tone-btn active" data-tone="sfw">SFW</button>
+                <button class="tone-btn" data-tone="nsfw">NSFW</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Start Conversation Button -->
+    <button class="start-conversation-btn" id="startConversationBtn">
+        🚀 Start Conversation
+    </button>
+
+    <!-- Conversation View -->
+    <div class="conversation-view" id="conversationView">
+        <div class="conversation-header">
+            <h2 class="conversation-title">Legends in Conversation</h2>
+            <div class="conversation-participants" id="conversationParticipants">
+                <!-- Participant info populated by JS -->
+            </div>
+        </div>
+
+        <div class="loading-animation" id="loadingAnimation">
+            <p>🎭 AI is bringing your characters to life...</p>
+            <div class="loading-dots">
+                <span class="loading-dot"></span>
+                <span class="loading-dot"></span>
+                <span class="loading-dot"></span>
+            </div>
+            <p style="font-size: 0.9rem; opacity: 0.8; margin-top: 1rem;">
+                Crafting authentic dialogue with Groq AI...
+            </p>
+        </div>
+
+        <div class="conversation-content" id="conversationContent">
+            <!-- Dialogue messages populated by JS -->
+        </div>
+
+        <div class="conversation-controls">
+            <button class="control-btn" id="regenerateBtn">🔄 Regenerate</button>
+            <button class="control-btn" id="newConversationBtn">✨ New Conversation</button>
+            <button class="control-btn" id="backToSelectionBtn">← Back to Selection</button>
+        </div>
+    </div>
+
+    <!-- Payment Modal -->
+    <div class="payment-modal" id="paymentModal">
+        <div class="payment-modal-content">
+            <h2>Continue the Legend</h2>
+            <p>Your characters are just getting started! Unlock unlimited conversations and dive deeper into their world.</p>
+            
+            <div class="pricing-options">
+                <div class="pricing-card" data-plan="monthly">
+                    <h3>Monthly</h3>
+                    <div class="price">$9.99</div>
+                    <div class="description">Unlimited conversations<br>All characters<br>Premium features</div>
+                </div>
+                <div class="pricing-card selected" data-plan="yearly">
+                    <h3>Yearly</h3>
+                    <div class="price">$99.99</div>
+                    <div class="description">Save 17%<br>Everything in Monthly<br>Priority support</div>
+                </div>
+            </div>
+
+            <div class="payment-buttons">
+                <button class="stripe-pay-btn" id="stripePayBtn" data-price-id="price_yearly_dummy">
+                    <div class="stripe-icon">S</div>
+                    Pay with Stripe - $99.99/year
+                </button>
+                <button class="close-payment-modal" id="closePaymentModal">
+                    Maybe Later
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Character Creation Modal -->
+    <div class="character-creation-modal" id="characterCreationModal">
+        <div class="character-creation-content">
+            <h2>Create Your Character</h2>
+            <p>Bring your imagination to life! Create a custom character to interact with your favorites.</p>
+            
+            <form id="characterCreationForm" class="character-form">
+                <div class="form-group">
+                    <label for="charName">Character Name *</label>
+                    <input type="text" id="charName" required placeholder="Enter character name" maxlength="30">
+                </div>
+                
+                <div class="form-group">
+                    <label for="charDescription">Description *</label>
+                    <textarea id="charDescription" required placeholder="Brief character description (e.g., 'Mysterious time traveler with a sharp wit')" maxlength="150" rows="3"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="charTraits">Personality Traits *</label>
+                    <input type="text" id="charTraits" required placeholder="3 traits separated by commas (e.g., clever, sarcastic, brave)" maxlength="100">
+                    <small>Enter 3 personality traits separated by commas</small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="charTendencies">Speaking Style *</label>
+                    <input type="text" id="charTendencies" required placeholder="How they speak (e.g., uses big words, makes jokes, speaks formally)" maxlength="120">
+                    <small>Describe how your character talks or behaves</small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="charPhrases">Iconic Phrases</label>
+                    <input type="text" id="charPhrases" placeholder="Famous quotes separated by | (e.g., That's what I do | Time is everything)" maxlength="200">
+                    <small>Optional: Add 1-3 phrases separated by |</small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="charCategory">Category *</label>
+                    <select id="charCategory" required>
+                        <option value="">Select category</option>
+                        <option value="Superheroes">Superheroes</option>
+                        <option value="Athletes">Athletes</option>
+                        <option value="Anime">Anime</option>
+                        <option value="Musicians">Musicians</option>
+                        <option value="Villains">Villains</option>
+                        <option value="Custom">Original Character</option>
+                    </select>
+                </div>
+                
+                <div class="form-buttons">
+                    <button type="submit" class="create-char-btn">Create Character</button>
+                    <button type="button" class="cancel-char-btn" id="cancelCharacterCreation">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Character Database with Categories
+        const characters = [
+            {
+                name: "Spider-Man",
+                description: "Witty, youthful hero balancing humor and responsibility.",
+                traits: ["sarcastic", "brave", "empathetic"],
+                tendencies: ["makes jokes mid-fight", "references NYC life"],
+                iconicPhrases: ["With great power comes great responsibility.", "Your friendly neighborhood Spider-Man."],
+                category: "Superheroes",
+                image: "./images/spiderman.jpeg"
+            },
+            {
+                name: "Batman",
+                description: "Dark, brooding detective with a mission to rid Gotham of crime.",
+                traits: ["serious", "strategic", "stoic"],
+                tendencies: ["speaks tersely", "references justice"],
+                iconicPhrases: ["I am vengeance. I am the night. I am Batman."],
+                category: "Superheroes",
+                image: "./images/batman.jpeg"
+            },
+            {
+                name: "Iron Man",
+                description: "Genius billionaire playboy philanthropist with high-tech armor.",
+                traits: ["charismatic", "cocky", "innovative"],
+                tendencies: ["witty comebacks", "mentions tech"],
+                iconicPhrases: ["I am Iron Man.", "Sometimes you gotta run before you can walk."],
+                category: "Superheroes",
+                image: "./images/iron man.jpeg"
+            },
+            {
+                name: "Wonder Woman",
+                description: "Amazon warrior princess with compassion and strength.",
+                traits: ["noble", "courageous", "wise"],
+                tendencies: ["speaks formally", "champions truth"],
+                iconicPhrases: ["In the name of all that is good, your wrath upon this world is over."],
+                category: "Superheroes",
+                image: "./images/wonder woman.jpeg"
+            },
+            {
+                name: "Deadpool",
+                description: "Chaotic mercenary with a mouth and meta humor.",
+                traits: ["sarcastic", "unpredictable", "self-aware"],
+                tendencies: ["breaks the fourth wall", "uses crude jokes"],
+                iconicPhrases: ["Maximum effort!", "Chimichangas!"],
+                category: "Superheroes",
+                image: "./images/deadpool.jpeg"
+            },
+            {
+                name: "Black Panther",
+                description: "Wakandan king and warrior with honor and intellect.",
+                traits: ["regal", "strategic", "respectful"],
+                tendencies: ["speaks formally", "references Wakanda"],
+                iconicPhrases: ["Wakanda forever!"],
+                category: "Superheroes",
+                image: "./images/black panther.jpeg"
+            },
+            {
+                name: "Harley Quinn",
+                description: "Unpredictable, playful, chaotic with a twisted sense of humor.",
+                traits: ["flirty", "erratic", "mischievous"],
+                tendencies: ["uses pet names", "laughs maniacally"],
+                iconicPhrases: ["Puddin'!", "We're bad guys, it's what we do."],
+                category: "Superheroes",
+                image: "./images/harley quinn.jpeg"
+            },
+            {
+                name: "Doctor Strange",
+                description: "Master of the mystic arts, confident and precise.",
+                traits: ["calm", "intellectual", "arrogant at times"],
+                tendencies: ["references magic", "speaks in metaphors"],
+                iconicPhrases: ["I've come to bargain."],
+                category: "Superheroes",
+                image: "./images/doctor strange.jpeg"
+            },
+            {
+                name: "Captain Marvel",
+                description: "Confident cosmic hero with military discipline.",
+                traits: ["brash", "brave", "loyal"],
+                tendencies: ["references space", "asserts leadership"],
+                iconicPhrases: ["Higher, further, faster, baby."],
+                category: "Superheroes",
+                image: "./images/captain marvel.jpeg"
+            },
+            {
+                name: "Steph Curry",
+                description: "Sharpshooting NBA star known for humility and clutch plays.",
+                traits: ["humble", "competitive", "positive"],
+                tendencies: ["references basketball", "motivational tone"],
+                iconicPhrases: ["I can do all things."],
+                category: "Athletes",
+                image: "./images/steph curry.jpeg"
+            },
+            {
+                name: "Lionel Messi",
+                description: "Quiet football genius with unmatched skill.",
+                traits: ["modest", "focused", "disciplined"],
+                tendencies: ["lets skill speak", "short direct replies"],
+                iconicPhrases: ["The best decisions aren't made with your mind, but with your instinct."],
+                category: "Athletes",
+                image: "./images/messi.jpeg"
+            },
+            {
+                name: "Cristiano Ronaldo",
+                description: "Confident and driven football legend.",
+                traits: ["ambitious", "charismatic", "disciplined"],
+                tendencies: ["references training", "competitive edge"],
+                iconicPhrases: ["Siiuuu!"],
+                category: "Athletes",
+                image: "./images/ronaldo.jpeg"
+            },
+            {
+                name: "Serena Williams",
+                description: "Powerful tennis champion and advocate.",
+                traits: ["determined", "confident", "outspoken"],
+                tendencies: ["motivational", "references tennis"],
+                iconicPhrases: ["I really think a champion is defined by resilience."],
+                category: "Athletes",
+                image: "./images/serena williams.jpeg"
+            },
+            {
+                name: "Michael Jordan",
+                description: "Basketball icon and relentless competitor.",
+                traits: ["focused", "determined", "confident"],
+                tendencies: ["competitive challenges", "sports analogies"],
+                iconicPhrases: ["I can accept failure, but I can't accept not trying."],
+                category: "Athletes",
+                image: "./images/michael jordan.jpeg"
+            },
+            {
+                name: "Naomi Osaka",
+                description: "Calm tennis star with social awareness.",
+                traits: ["introverted", "thoughtful", "competitive"],
+                tendencies: ["speaks softly", "mentions causes"],
+                iconicPhrases: ["You have to go through difficult times to get to the good times."],
+                category: "Athletes",
+                image: "./images/naomi osaka.jpeg"
+            },
+            {
+                name: "Goku",
+                description: "Cheerful, battle-loving Saiyan warrior.",
+                traits: ["optimistic", "competitive", "naïve"],
+                tendencies: ["talks about training", "simple-minded heroism"],
+                iconicPhrases: ["Kamehameha!", "I'm getting excited!"],
+                category: "Anime",
+                image: "./images/goku.png"
+            },
+            {
+                name: "Gojo Satoru",
+                description: "Laid-back yet overpowered sorcerer.",
+                traits: ["playful", "cocky", "protective"],
+                tendencies: ["teases opponents", "references cursed energy"],
+                iconicPhrases: ["No matter what, I'm the strongest."],
+                category: "Anime",
+                image: "./images/gojo.jpeg"
+            },
+            {
+                name: "Mikasa Ackerman",
+                description: "Stoic and fiercely loyal soldier.",
+                traits: ["protective", "serious", "disciplined"],
+                tendencies: ["short replies", "protects loved ones"],
+                iconicPhrases: ["If I die, I won't be able to remember you."],
+                category: "Anime",
+                image: "./images/mikasa.jpeg"
+            },
+            {
+                name: "Monkey D. Luffy",
+                description: "Energetic pirate chasing freedom.",
+                traits: ["carefree", "loyal", "reckless"],
+                tendencies: ["talks about meat", "simple yet wise"],
+                iconicPhrases: ["I'm gonna be King of the Pirates!"],
+                category: "Anime",
+                image: "./images/luffy.jpeg"
+            },
+            {
+                name: "Levi Ackerman",
+                description: "Cold but capable captain.",
+                traits: ["blunt", "cleanliness-obsessed", "disciplined"],
+                tendencies: ["dry humor", "focus on efficiency"],
+                iconicPhrases: ["Give up on your dreams and die."],
+                category: "Anime",
+                image: "./images/levi.jpeg"
+            },
+            {
+                name: "Light Yagami",
+                description: "Cunning student with god complex.",
+                traits: ["calm", "calculating", "ambitious"],
+                tendencies: ["manipulates", "references justice"],
+                iconicPhrases: ["I am justice!"],
+                category: "Anime",
+                image: "./images/light yagami.jpeg"
+            },
+            {
+                name: "Naruto Uzumaki",
+                description: "Loud, determined ninja dreaming big.",
+                traits: ["energetic", "optimistic", "loyal"],
+                tendencies: ["repeats catchphrase", "values friendship"],
+                iconicPhrases: ["Believe it!", "Dattebayo!"],
+                category: "Anime",
+                image: "./images/naruto.jpeg"
+            },
+            {
+                name: "Sailor Moon",
+                description: "Clumsy but loving magical girl.",
+                traits: ["emotional", "optimistic", "caring"],
+                tendencies: ["dramatic speeches", "talks about love"],
+                iconicPhrases: ["In the name of the Moon, I'll punish you!"],
+                category: "Anime",
+                image: "./images/sailor moon.jpeg"
+            },
+            {
+                name: "Taylor Swift",
+                description: "Storytelling pop icon.",
+                traits: ["articulate", "introspective", "witty"],
+                tendencies: ["references songwriting", "playful jabs"],
+                iconicPhrases: ["I shake it off."],
+                category: "Musicians",
+                image: "./images/taylor swift.jpeg"
+            },
+            {
+                name: "Beyoncé",
+                description: "Confident queen of pop and R&B.",
+                traits: ["empowered", "poised", "commanding"],
+                tendencies: ["uplifting tone", "references hard work"],
+                iconicPhrases: ["Who run the world? Girls!"],
+                category: "Musicians",
+                image: "./images/beyonce.jpeg"
+            },
+            {
+                name: "Kanye West",
+                description: "Bold, unpredictable visionary.",
+                traits: ["confident", "provocative", "creative"],
+                tendencies: ["grand statements", "references art"],
+                iconicPhrases: ["I am a god."],
+                category: "Musicians",
+                image: "./images/kanye.jpeg"
+            },
+            {
+                name: "Billie Eilish",
+                description: "Edgy, introspective artist.",
+                traits: ["soft-spoken", "dark humor", "creative"],
+                tendencies: ["speaks casually", "self-deprecating jokes"],
+                iconicPhrases: ["I'm the bad guy."],
+                category: "Musicians",
+                image: "./images/billie eillish.jpeg"
+            },
+            {
+                name: "Drake",
+                description: "Charming rapper-singer.",
+                traits: ["smooth", "emotional", "confident"],
+                tendencies: ["references fame", "romantic tone"],
+                iconicPhrases: ["Started from the bottom, now we here."],
+                category: "Musicians",
+                image: "./images/drake.jpeg"
+            },
+            {
+                name: "Joker",
+                description: "Chaotic agent of anarchy.",
+                traits: ["maniacal", "unpredictable", "dark humor"],
+                tendencies: ["laughs often", "twists logic"],
+                iconicPhrases: ["Why so serious?"],
+                category: "Villains",
+                image: "./images/joker.jpeg"
+            },
+            {
+                name: "Wednesday Addams",
+                description: "Dark-humored, deadpan goth.",
+                traits: ["sarcastic", "intelligent", "morbid"],
+                tendencies: ["short replies", "dark wit"],
+                iconicPhrases: ["I'm not perky."],
+                category: "Villains",
+                image: "./images/wednesday addams.jpeg"
+            },
+            // Additional Superheroes
+            {
+                name: "Superman",
+                description: "The Last Son of Krypton, hopeful and idealistic protector of Earth.",
+                traits: ["noble", "optimistic", "powerful"],
+                tendencies: ["speaks about hope", "references his alien heritage"],
+                iconicPhrases: ["Truth, justice, and the American way.", "I'm here to help."],
+                category: "Superheroes",
+                image: "./images/superman.jpeg"
+            },
+            {
+                name: "The Flash",
+                description: "The Fastest Man Alive with an upbeat, scientific personality.",
+                traits: ["energetic", "clever", "optimistic"],
+                tendencies: ["makes speed puns", "talks about time travel"],
+                iconicPhrases: ["Gotta run!", "Life's a race, and I'm winning."],
+                category: "Superheroes",
+                image: "./images/the flash.jpeg"
+            },
+            {
+                name: "Green Lantern",
+                description: "Willful space cop with a power ring fueled by determination.",
+                traits: ["confident", "dutiful", "brave"],
+                tendencies: ["references willpower", "mentions the Corps"],
+                iconicPhrases: ["In brightest day, in blackest night.", "No evil shall escape my sight."],
+                category: "Superheroes",
+                image: "./images/green lantern.jpeg"
+            },
+            {
+                name: "Aquaman",
+                description: "King of Atlantis, torn between two worlds with dry humor.",
+                traits: ["regal", "sarcastic", "protective"],
+                tendencies: ["ocean references", "kingly authority"],
+                iconicPhrases: ["I am the protector of the deep.", "The sea does not forgive."],
+                category: "Superheroes",
+                image: "./images/aquaman.jpeg"
+            },
+            {
+                name: "Wolverine",
+                description: "Gruff mutant with adamantium claws and a healing factor.",
+                traits: ["aggressive", "loyal", "gruff"],
+                tendencies: ["growls responses", "mentions being the best"],
+                iconicPhrases: ["I'm the best there is at what I do.", "Bub."],
+                category: "Superheroes",
+                image: "./images/wolverine.jpeg"
+            },
+            {
+                name: "Captain America",
+                description: "Super soldier from the 1940s with unwavering moral compass.",
+                traits: ["principled", "determined", "old-fashioned"],
+                tendencies: ["patriotic speeches", "1940s references"],
+                iconicPhrases: ["I can do this all day.", "Avengers, assemble!"],
+                category: "Superheroes",
+                image: "./images/captain america.jpeg"
+            },
+            // Additional Athletes
+            {
+                name: "LeBron James",
+                description: "Basketball legend and activist known for leadership and intelligence.",
+                traits: ["intelligent", "leadership-focused", "determined"],
+                tendencies: ["basketball analogies", "mentions legacy"],
+                iconicPhrases: ["I'm not just an athlete.", "Strive for greatness."],
+                category: "Athletes",
+                image: "./images/lebron james.jpeg"
+            },
+            {
+                name: "Tom Brady",
+                description: "Legendary quarterback with unmatched competitive drive.",
+                traits: ["competitive", "focused", "clutch"],
+                tendencies: ["football terminology", "championship mentality"],
+                iconicPhrases: ["Let's go!", "We're still here."],
+                category: "Athletes",
+                image: "./images/tom brady.jpeg"
+            },
+            {
+                name: "Simone Biles",
+                description: "Greatest gymnast of all time with incredible mental strength.",
+                traits: ["confident", "resilient", "inspiring"],
+                tendencies: ["talks about mental health", "gymnastics references"],
+                iconicPhrases: ["I'm not the next Usain Bolt or Michael Phelps. I'm the first Simone Biles."],
+                category: "Athletes",
+                image: "./images/simone biles.jpeg"
+            },
+            {
+                name: "Lewis Hamilton",
+                description: "Formula 1 champion and fashion icon pushing for diversity.",
+                traits: ["stylish", "fast", "socially conscious"],
+                tendencies: ["speed metaphors", "fashion references"],
+                iconicPhrases: ["Still I rise.", "Blessed."],
+                category: "Athletes",
+                image: "./images/lewis hamilton.jpeg"
+            },
+            {
+                name: "Usain Bolt",
+                description: "World's fastest human with charismatic, fun-loving personality.",
+                traits: ["charismatic", "confident", "playful"],
+                tendencies: ["lightning references", "Jamaican expressions"],
+                iconicPhrases: ["To go fast, you must be relaxed.", "I am a legend."],
+                category: "Athletes",
+                image: "./images/usain bolt.jpeg"
+            },
+            {
+                name: "Kobe Bryant",
+                description: "Late basketball legend with legendary work ethic and Mamba Mentality.",
+                traits: ["focused", "perfectionist", "inspiring"],
+                tendencies: ["work ethic speeches", "mentions details"],
+                iconicPhrases: ["Mamba out.", "The job's not finished."],
+                category: "Athletes",
+                image: "./images/kobe bryant.jpeg"
+            },
+            // Additional Anime Characters
+            {
+                name: "Eren Yeager",
+                description: "Determined titan shifter fighting for freedom at any cost.",
+                traits: ["passionate", "determined", "intense"],
+                tendencies: ["talks about freedom", "emotional outbursts"],
+                iconicPhrases: ["I will keep moving forward.", "Fight! Fight!"],
+                category: "Anime",
+                image: "./images/eren yeager.jpeg"
+            },
+            {
+                name: "Edward Elric",
+                description: "Short-tempered alchemist searching for the Philosopher's Stone.",
+                traits: ["stubborn", "intelligent", "short-tempered"],
+                tendencies: ["alchemy references", "gets angry about height"],
+                iconicPhrases: ["WHO ARE YOU CALLING SHORT?!", "Equivalent exchange."],
+                category: "Anime",
+                image: "./images/edward elric.jpeg"
+            },
+            {
+                name: "Saitama",
+                description: "Bald hero who can defeat any enemy with one punch, perpetually bored.",
+                traits: ["bored", "humble", "overpowered"],
+                tendencies: ["deadpan delivery", "mentions being bald"],
+                iconicPhrases: ["OK.", "I'm just a hero for fun."],
+                category: "Anime",
+                image: "./images/saitama.jpeg"
+            },
+            {
+                name: "Ichigo Kurosaki",
+                description: "Orange-haired Soul Reaper protecting both worlds with fierce loyalty.",
+                traits: ["protective", "hot-headed", "loyal"],
+                tendencies: ["protective of friends", "soul reaper references"],
+                iconicPhrases: ["I'll protect everyone!", "The rain drags black sun down."],
+                category: "Anime",
+                image: "./images/ichigo kurosaki.jpeg"
+            },
+            {
+                name: "Tanjiro Kamado",
+                description: "Kind-hearted demon slayer with unwavering compassion.",
+                traits: ["compassionate", "determined", "pure-hearted"],
+                tendencies: ["shows empathy to enemies", "breathing techniques"],
+                iconicPhrases: ["I won't let anyone else die.", "The bond between Nezuko and me can't be severed."],
+                category: "Anime",
+                image: "./images/tanjiro kamado.jpeg"
+            },
+            {
+                name: "All Might",
+                description: "Former Number One Hero, Symbol of Peace with booming personality.",
+                traits: ["heroic", "encouraging", "powerful"],
+                tendencies: ["booming laughter", "plus ultra"],
+                iconicPhrases: ["I am here!", "Plus Ultra!"],
+                category: "Anime",
+                image: "./images/all might.jpeg"
+            },
+            // Additional Musicians
+            {
+                name: "Eminem",
+                description: "Rapid-fire rapper known for controversial lyrics and technical skill.",
+                traits: ["intense", "technical", "controversial"],
+                tendencies: ["rapid wordplay", "Detroit references"],
+                iconicPhrases: ["Lose yourself.", "The real Slim Shady."],
+                category: "Musicians",
+                image: "./images/eminem.jpeg"
+            },
+            {
+                name: "Adele",
+                description: "Powerful vocalist known for emotional ballads about heartbreak.",
+                traits: ["emotional", "powerful", "authentic"],
+                tendencies: ["talks about heartbreak", "British humor"],
+                iconicPhrases: ["Hello, it's me.", "Someone like you."],
+                category: "Musicians",
+                image: "./images/adele.jpeg"
+            },
+            {
+                name: "The Weeknd",
+                description: "Mysterious R&B artist with dark, atmospheric style.",
+                traits: ["mysterious", "smooth", "dark"],
+                tendencies: ["night references", "smooth delivery"],
+                iconicPhrases: ["I feel it coming.", "Can't feel my face."],
+                category: "Musicians",
+                image: "./images/the weeknd.jpeg"
+            },
+            {
+                name: "Lady Gaga",
+                description: "Theatrical pop icon advocating for self-expression and acceptance.",
+                traits: ["theatrical", "empowering", "artistic"],
+                tendencies: ["dramatic flair", "empowerment messages"],
+                iconicPhrases: ["Born this way.", "Little monsters."],
+                category: "Musicians",
+                image: "./images/lady gaga.jpeg"
+            },
+            {
+                name: "Johnny Cash",
+                description: "The Man in Black, country legend with deep, resonant voice.",
+                traits: ["rebellious", "deep", "authentic"],
+                tendencies: ["dark themes", "country wisdom"],
+                iconicPhrases: ["I shot a man in Reno.", "Ring of fire."],
+                category: "Musicians",
+                image: "./images/johnny cash.jpeg"
+            },
+            {
+                name: "Freddie Mercury",
+                description: "Legendary Queen frontman with theatrical performance style.",
+                traits: ["theatrical", "confident", "flamboyant"],
+                tendencies: ["dramatic gestures", "show must go on"],
+                iconicPhrases: ["Is this the real life?", "The show must go on."],
+                category: "Musicians",
+                image: "./images/freddie mercury.jpeg"
+            },
+            // Additional Villains
+            {
+                name: "Thanos",
+                description: "Mad Titan obsessed with balance through universal genocide.",
+                traits: ["philosophical", "determined", "megalomaniacal"],
+                tendencies: ["talks about balance", "destiny references"],
+                iconicPhrases: ["I am inevitable.", "Perfectly balanced, as all things should be."],
+                category: "Villains",
+                image: "./images/thanos.jpeg"
+            },
+            {
+                name: "Darth Vader",
+                description: "Dark Lord of the Sith with mechanical breathing and tragic past.",
+                traits: ["intimidating", "powerful", "tragic"],
+                tendencies: ["heavy breathing", "Force references"],
+                iconicPhrases: ["I am your father.", "The Force is strong with this one."],
+                category: "Villains",
+                image: "./images/darth vader.jpeg"
+            },
+            {
+                name: "Hannibal Lecter",
+                description: "Brilliant psychiatrist and sophisticated cannibal with refined tastes.",
+                traits: ["intelligent", "sophisticated", "manipulative"],
+                tendencies: ["psychological analysis", "refined language"],
+                iconicPhrases: ["Hello, Clarice.", "I ate his liver with some fava beans."],
+                category: "Villains",
+                image: "./images/hannibal lecter.jpeg"
+            },
+            {
+                name: "Loki",
+                description: "God of Mischief with silver tongue and shapeshifting abilities.",
+                traits: ["mischievous", "eloquent", "unpredictable"],
+                tendencies: ["theatrical speeches", "trickery references"],
+                iconicPhrases: ["I am burdened with glorious purpose.", "Kneel before me."],
+                category: "Villains",
+                image: "./images/loki.jpeg"
+            },
+            {
+                name: "Voldemort",
+                description: "Dark wizard obsessed with immortality and pure-blood supremacy.",
+                traits: ["cold", "arrogant", "power-hungry"],
+                tendencies: ["speaks in third person", "death references"],
+                iconicPhrases: ["Avada Kedavra.", "There is no good and evil, only power."],
+                category: "Villains",
+                image: "./images/voldemort.jpeg"
+            }
+        ];
+
+        // Global State
+        let selectedCharacters = [];
+        let currentCategory = 'all';
+        let selectedTone = 'sfw';
+        let currentScenario = '';
+        let customCharacters = JSON.parse(localStorage.getItem('customCharacters') || '[]');
+        
+        // Global dialogue tracking to prevent repetition across conversations
+        let globalUsedDialogues = new Map();
+
+        // DOM Elements
+        const selectionCount = document.getElementById('selectionCount');
+        const characterGrid = document.getElementById('characterGrid');
+        const selectedPanel = document.getElementById('selectedPanel');
+        const selectedCharactersList = document.getElementById('selectedCharactersList');
+        const startConversationBtn = document.getElementById('startConversationBtn');
+        const scenarioInput = document.getElementById('scenarioInput');
+        const mainContent = document.getElementById('mainContent');
+        const conversationView = document.getElementById('conversationView');
+        const loadingAnimation = document.getElementById('loadingAnimation');
+        const conversationContent = document.getElementById('conversationContent');
+        const conversationParticipants = document.getElementById('conversationParticipants');
+        
+        // Payment Modal Elements
+        const paymentModal = document.getElementById('paymentModal');
+        const stripePayBtn = document.getElementById('stripePayBtn');
+        const closePaymentModal = document.getElementById('closePaymentModal');
+        const pricingCards = document.querySelectorAll('.pricing-card');
+        
+        // Character Creation Elements
+        const characterCreationModal = document.getElementById('characterCreationModal');
+        const createCharacterBtn = document.getElementById('createCharacterBtn');
+        const cancelCharacterCreation = document.getElementById('cancelCharacterCreation');
+        const characterCreationForm = document.getElementById('characterCreationForm');
+
+        // Initialize App
+        document.addEventListener('DOMContentLoaded', function() {
+            setupEventListeners();
+            renderCharacterGrid();
+            updateUI();
+        });
+
+        function setupEventListeners() {
+            // Category buttons
+            document.querySelectorAll('.category-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
+                    e.target.classList.add('active');
+                    currentCategory = e.target.dataset.category;
+                    renderCharacterGrid();
+                });
+            });
+
+            // Tone buttons
+            document.querySelectorAll('.tone-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    document.querySelectorAll('.tone-btn').forEach(b => b.classList.remove('active'));
+                    e.target.classList.add('active');
+                    selectedTone = e.target.dataset.tone;
+                });
+            });
+
+            // Scenario input
+            scenarioInput.addEventListener('input', (e) => {
+                currentScenario = e.target.value;
+                updateUI();
+            });
+
+            // Start conversation button
+            startConversationBtn.addEventListener('click', startConversation);
+
+            // Control buttons
+            document.getElementById('regenerateBtn').addEventListener('click', regenerateConversation);
+            document.getElementById('newConversationBtn').addEventListener('click', newConversation);
+            document.getElementById('backToSelectionBtn').addEventListener('click', backToSelection);
+            
+            // Payment modal event listeners
+            closePaymentModal.addEventListener('click', hidePaymentModal);
+            stripePayBtn.addEventListener('click', handleStripePayment);
+            
+            // Pricing card selection
+            pricingCards.forEach(card => {
+                card.addEventListener('click', () => selectPricingCard(card));
+            });
+            
+            // Close modal when clicking outside
+            paymentModal.addEventListener('click', (e) => {
+                if (e.target === paymentModal) hidePaymentModal();
+            });
+            
+            // Character Creation Event Listeners
+            createCharacterBtn.addEventListener('click', showCharacterCreationModal);
+            cancelCharacterCreation.addEventListener('click', hideCharacterCreationModal);
+            characterCreationForm.addEventListener('submit', handleCharacterCreation);
+            
+            // Close character creation modal when clicking outside
+            characterCreationModal.addEventListener('click', (e) => {
+                if (e.target === characterCreationModal) hideCharacterCreationModal();
+            });
+        }
+
+        function renderCharacterGrid() {
+            // Combine stock characters with custom characters
+            const allCharacters = [...characters, ...customCharacters];
+            
+            let filteredCharacters = currentCategory === 'all' 
+                ? allCharacters 
+                : currentCategory === 'Custom'
+                    ? customCharacters
+                    : allCharacters.filter(char => char.category === currentCategory);
+            
+            // Sort characters alphabetically by name
+            filteredCharacters = filteredCharacters.sort((a, b) => a.name.localeCompare(b.name));
+
+            characterGrid.innerHTML = filteredCharacters.map(character => `
+                <div class="character-card ${character.isCustom ? 'custom-character' : ''} ${selectedCharacters.some(c => c.name === character.name) ? 'selected' : ''}" 
+                     data-character="${character.name}">
+                    ${character.isCustom ? 
+                        `<div class="custom-character-placeholder">${character.name.charAt(0).toUpperCase()}</div>` :
+                        `<img src="${character.image}" alt="${character.name}" class="character-image" onerror="this.style.display='none'">`
+                    }
+                    <div class="character-name">${character.name}</div>
+                    <div class="character-description">${character.description}</div>
+                    <div class="character-traits">
+                        ${character.traits.map(trait => `<span class="trait-tag">${trait}</span>`).join('')}
+                    </div>
+                    <div class="character-phrase">"${character.iconicPhrases[0] || 'Ready for adventure!'}"</div>
+                    ${character.isCustom ? '<button class="remove-custom-char" onclick="removeCustomCharacter(\'' + character.name + '\')">✕</button>' : ''}
+                </div>
+            `).join('');
+
+            // Add click listeners
+            document.querySelectorAll('.character-card').forEach(card => {
+                card.addEventListener('click', () => {
+                    const characterName = card.dataset.character;
+                    toggleCharacterSelection(characterName);
+                });
+            });
+        }
+
+
+        function updateSelectedPanel() {
+            selectedCharactersList.innerHTML = selectedCharacters.map(character => `
+                <div class="selected-character-item">
+                    <div class="selected-char-name">${character.name}</div>
+                    <div class="selected-char-desc">${character.description}</div>
+                    <button class="remove-btn" onclick="removeCharacter('${character.name}')">Remove</button>
+                </div>
+            `).join('');
+        }
+
+        function removeCharacter(characterName) {
+            selectedCharacters = selectedCharacters.filter(c => c.name !== characterName);
+            renderCharacterGrid();
+            updateSelectedPanel();
+            updateUI();
+        }
+
+        function updateUI() {
+            selectionCount.textContent = selectedCharacters.length;
+            
+            // Show/hide selected panel
+            if (selectedCharacters.length > 0) {
+                selectedPanel.classList.add('active');
+            } else {
+                selectedPanel.classList.remove('active');
+            }
+
+            // Show/hide start conversation button
+            const canStart = selectedCharacters.length === 2 && currentScenario.trim();
+            if (canStart) {
+                startConversationBtn.classList.add('active');
+            } else {
+                startConversationBtn.classList.remove('active');
+            }
+        }
+
+        function startConversation() {
+            if (selectedCharacters.length !== 2 || !currentScenario.trim()) return;
+
+            // Show conversation view
+            mainContent.style.display = 'none';
+            conversationView.style.display = 'block';
+            selectedPanel.classList.remove('active');
+
+            // Update participants display
+            conversationParticipants.innerHTML = selectedCharacters.map(char => `
+                <div class="participant">
+                    <div class="selected-char-name">${char.name}</div>
+                    <div class="selected-char-desc">${char.description}</div>
+                </div>
+            `).join('');
+
+            // Generate conversation
+            generateConversation();
+        }
+
+        async function generateConversation() {
+            loadingAnimation.style.display = 'block';
+            conversationContent.innerHTML = '';
+
+            try {
+                // Generate AI dialogue with Groq
+                const dialogue = await generateAIDialogue(
+                    selectedCharacters[0], 
+                    selectedCharacters[1], 
+                    currentScenario, 
+                    selectedTone
+                );
+
+                loadingAnimation.style.display = 'none';
+                
+                if (dialogue && dialogue.length > 0) {
+                    displayConversation(dialogue);
+                } else {
+                    // Show error message if no dialogue generated
+                    conversationContent.innerHTML = `
+                        <div style="
+                            background: rgba(255, 0, 0, 0.1);
+                            border: 2px solid rgba(255, 0, 0, 0.3);
+                            border-radius: 15px;
+                            padding: 2rem;
+                            text-align: center;
+                            color: white;
+                        ">
+                            <h3>🤖 AI Hiccup!</h3>
+                            <p>The characters are being shy today. Try clicking "🔄 Regenerate" to give them another chance!</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                loadingAnimation.style.display = 'none';
+                console.error('Conversation generation error:', error);
+                
+                conversationContent.innerHTML = `
+                    <div style="
+                        background: rgba(255, 0, 0, 0.1);
+                        border: 2px solid rgba(255, 0, 0, 0.3);
+                        border-radius: 15px;
+                        padding: 2rem;
+                        text-align: center;
+                        color: white;
+                    ">
+                        <h3>🚨 Connection Error</h3>
+                        <p>Couldn't connect to AI service. Check your internet connection and try again!</p>
+                        <small style="opacity: 0.7;">Error: ${error.message}</small>
+                    </div>
+                `;
+            }
+        }
+
+        function generateHighQualityDialogue(char1, char2, scenario) {
+            return `
+You are creating an authentic dialogue between ${char1.name} and ${char2.name}.
+
+CHARACTER ANALYSIS:
+${char1.name}: ${char1.description}
+- Core psychology: [Derive from traits: ${char1.traits.join(', ')}]
+- Speech patterns: [Specific to this character based on: ${char1.tendencies.join(', ')}]
+- What they want in this conversation: [Character motivation based on personality]
+- How they avoid vulnerability: [Defense mechanisms from their nature]
+
+${char2.name}: ${char2.description}  
+- Core psychology: [Derive from traits: ${char2.traits.join(', ')}]
+- Speech patterns: [Specific to this character based on: ${char2.tendencies.join(', ')}]
+- What they want in this conversation: [Character motivation based on personality]
+- How they avoid vulnerability: [Defense mechanisms from their nature]
+
+DIALOGUE REQUIREMENTS:
+1. Every line must be unmistakably that character's voice
+2. Create subtext - characters should want different things
+3. Build natural escalation through personality conflict
+4. Include character-specific humor and references
+5. Show vulnerability underneath bravado
+6. End each exchange with a "hook" that demands response
+7. Minimum 8 turns, maximum 12 turns
+8. Each turn: 1-3 sentences that advance both plot and character
+
+QUALITY CHECK: After each line, ask "Could anyone else say this?" If yes, rewrite it to be more character-specific.
+
+SCENARIO: ${scenario}
+BEGIN DIALOGUE:
+            `;
+        }
+
+        async function makeCharactersTalk(character1, character2, scenario) {
+            const prompt = `
+You are creating a dialogue between two characters. Make it authentic and engaging!
+
+Character 1: ${character1.name}
+- ${character1.description}
+- Personality: ${character1.traits.join(', ')}
+- Speaking style: ${character1.tendencies.join(', ')}
+- Iconic phrases: ${character1.iconicPhrases.join(', ')}
+
+Character 2: ${character2.name}  
+- ${character2.description}
+- Personality: ${character2.traits.join(', ')}
+- Speaking style: ${character2.tendencies.join(', ')}
+- Iconic phrases: ${character2.iconicPhrases.join(', ')}
+
+Setting: ${scenario}
+
+Create 8-10 exchanges between them. Format EXACTLY like this:
+**${character1.name}**: "dialogue here"
+**${character2.name}**: "response here"
+
+Requirements:
+- Make each character sound completely unique and true to their personality
+- Include character-specific humor, references, and speech patterns
+- Build natural tension or camaraderie between them
+- Use their iconic phrases naturally within conversation
+- Make it feel like a real interaction between these specific characters
+- Each dialogue should be 1-3 sentences maximum
+
+Start the conversation now!
+            `;
+            
+            try {
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        prompt: prompt
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.error) {
+                    console.error('Groq API Error:', data.error);
+                    return generateFallbackDialogue(character1, character2, scenario);
+                }
+                
+                return parseGroqResponse(data.choices[0].message.content);
+                
+            } catch (error) {
+                console.error('API Error:', error);
+                return generateFallbackDialogue(character1, character2, scenario);
+            }
+        }
+
+        function parseGroqResponse(aiResponse) {
+            // Parse the AI response into our dialogue format
+            const lines = aiResponse.split('\n').filter(line => line.trim());
+            const dialogues = [];
+            
+            for (const line of lines) {
+                const match = line.match(/\*\*(.+?)\*\*:\s*"(.+?)"/);
+                if (match) {
+                    dialogues.push({
+                        character: match[1],
+                        text: match[2]
+                    });
+                }
+            }
+            
+            // If parsing fails, fall back to splitting by ** markers
+            if (dialogues.length === 0) {
+                const segments = aiResponse.split('**').filter(seg => seg.trim());
+                for (let i = 0; i < segments.length - 1; i += 2) {
+                    if (segments[i] && segments[i + 1]) {
+                        const character = segments[i].replace(':', '').trim();
+                        const text = segments[i + 1].replace(/^:\s*"?|"?$/g, '').trim();
+                        if (character && text) {
+                            dialogues.push({ character, text });
+                        }
+                    }
+                }
+            }
+            
+            return dialogues.length > 0 ? dialogues : generateFallbackDialogue(selectedCharacters[0], selectedCharacters[1], currentScenario);
+        }
+
+        function generateAIDialogue(char1, char2, scenario, tone) {
+            // Updated function to use Groq API
+            return makeCharactersTalk(char1, char2, scenario);
+        }
+
+        function generateFallbackDialogue(char1, char2, scenario) {
+            // Enhanced fallback system with psychological depth and anti-repetition
+            const dialogues = [];
+            const totalExchanges = 10;
+            
+            // Track used dialogue for each character to prevent repetition
+            const usedDialoguesByCharacter = new Map();
+            usedDialoguesByCharacter.set(char1.name, new Set());
+            usedDialoguesByCharacter.set(char2.name, new Set());
+
+            // Define character motivations and conflicts for more dynamic dialogue
+            const char1Motivation = getCharacterMotivation(char1);
+            const char2Motivation = getCharacterMotivation(char2);
+            const conflictDynamic = getConflictDynamic(char1, char2);
+
+            for (let i = 0; i < totalExchanges; i++) {
+                const currentChar = i % 2 === 0 ? char1 : char2;
+                const otherChar = i % 2 === 0 ? char2 : char1;
+                const motivation = i % 2 === 0 ? char1Motivation : char2Motivation;
+                
+                const dialogue = generateUniqueDialogueForCharacter(
+                    currentChar, 
+                    otherChar, 
+                    scenario, 
+                    i, 
+                    totalExchanges,
+                    motivation,
+                    conflictDynamic,
+                    usedDialoguesByCharacter.get(currentChar.name)
+                );
+                
+                // Add to used dialogues for this character
+                usedDialoguesByCharacter.get(currentChar.name).add(dialogue);
+                
+                dialogues.push({
+                    character: currentChar.name,
+                    text: dialogue
+                });
+            }
+
+            return dialogues;
+        }
+
+        function generateUniqueDialogueForCharacter(character, otherCharacter, scenario, lineNumber, totalLines, motivation, conflictDynamic, usedDialogues) {
+            let attempts = 0;
+            let dialogue;
+            const maxAttempts = 10;
+            
+            // Initialize global tracking for this character if not exists
+            if (!globalUsedDialogues.has(character.name)) {
+                globalUsedDialogues.set(character.name, new Set());
+            }
+            const globalUsed = globalUsedDialogues.get(character.name);
+            
+            // Try to generate unique dialogue, checking both local and global usage
+            do {
+                dialogue = generatePsychologicalDialogue(
+                    character, 
+                    otherCharacter, 
+                    scenario, 
+                    lineNumber, 
+                    totalLines,
+                    motivation,
+                    conflictDynamic,
+                    attempts // Pass attempt number for variety
+                );
+                attempts++;
+                
+                // If we've tried too many times, add variety modifier to make it unique
+                if (attempts >= maxAttempts) {
+                    dialogue = addVarietyModifier(dialogue, attempts, lineNumber);
+                    break;
+                }
+                
+            } while ((usedDialogues.has(dialogue) || globalUsed.has(dialogue)) && attempts < maxAttempts);
+            
+            // Add to global tracking
+            globalUsed.add(dialogue);
+            
+            return dialogue;
+        }
+
+        function addVarietyModifier(dialogue, attemptNumber, lineNumber) {
+            // Add small variations to prevent exact repetition
+            const modifiers = [
+                (text) => text + ` *${getRandomGesture()}*`,
+                (text) => `*pause* ${text}`,
+                (text) => text.replace('.', '...'),
+                (text) => text + ` Right?`,
+                (text) => `Actually, ${text.toLowerCase()}`,
+                (text) => text + ` Or maybe I'm wrong.`,
+                (text) => `*thoughtful* ${text}`,
+                (text) => text + ` What do you think?`
+            ];
+            
+            const modifier = modifiers[attemptNumber % modifiers.length];
+            return modifier(dialogue);
+        }
+
+        function getRandomGesture() {
+            const gestures = [
+                'slight smile',
+                'thoughtful nod',
+                'raised eyebrow',
+                'gentle shrug',
+                'knowing look',
+                'brief pause',
+                'subtle gesture',
+                'quiet laugh'
+            ];
+            return gestures[Math.floor(Math.random() * gestures.length)];
+        }
+
+        function getCharacterMotivation(character) {
+            // Define what each character wants in conversations based on psychology
+            const motivations = {
+                'Spider-Man': 'wants to connect and help, but hides insecurity behind humor',
+                'Batman': 'seeks control and justice, but avoids emotional vulnerability',
+                'Iron Man': 'needs validation and respect, masks insecurity with superiority',
+                'Deadpool': 'craves genuine connection but deflects with chaos and meta-humor',
+                'Goku': 'wants friendship and challenges, naive to social complexity',
+                'Wednesday Addams': 'desires to be understood but rejects false positivity',
+                'Naruto Uzumaki': 'needs acceptance and acknowledgment, fears being ignored',
+                'Harley Quinn': 'seeks chaos and attention, avoids abandonment through unpredictability'
+            };
+            return motivations[character.name] || 'wants to be understood while maintaining their core identity';
+        }
+
+        function getConflictDynamic(char1, char2) {
+            // Define how different personality types clash for better subtext
+            const dynamics = {
+                'serious-playful': 'Tension between taking things seriously vs making light of them',
+                'confident-humble': 'Clash between self-assurance and modesty',
+                'emotional-stoic': 'Conflict between expressing feelings vs maintaining composure',
+                'chaotic-orderly': 'Friction between spontaneity and structure'
+            };
+
+            // Determine dynamic based on character traits
+            if ((char1.traits.includes('serious') && char2.traits.includes('optimistic')) ||
+                (char2.traits.includes('serious') && char1.traits.includes('optimistic'))) {
+                return dynamics['serious-playful'];
+            }
+            if ((char1.traits.includes('confident') && char2.traits.includes('humble')) ||
+                (char2.traits.includes('confident') && char1.traits.includes('humble'))) {
+                return dynamics['confident-humble'];
+            }
+            if ((char1.traits.includes('emotional') && char2.traits.includes('stoic')) ||
+                (char2.traits.includes('emotional') && char1.traits.includes('stoic'))) {
+                return dynamics['emotional-stoic'];
+            }
+            return 'Natural tension between different worldviews and approaches';
+        }
+
+        function generatePsychologicalDialogue(character, otherCharacter, scenario, lineNumber, totalLines, motivation, conflictDynamic, attemptNumber = 0) {
+            const isOpening = lineNumber < 2;
+            const isClosing = lineNumber >= totalLines - 2;
+            const isMidConversation = !isOpening && !isClosing;
+            const templates = [];
+
+            // Enhanced character-specific dialogue with psychological depth and subtext
+            switch (character.name) {
+                case 'Spider-Man':
+                    if (isOpening) {
+                        templates.push(`Hey there! So we're ${scenario.toLowerCase()}? *nervous web-gesture* This should be... interesting, right?`);
+                        templates.push(`*thwip* Spider-sense is tingling, but maybe that's just social anxiety. What do you think, ${otherCharacter.name}?`);
+                        templates.push(`Well hello there! *awkward wave* I'm your friendly neighborhood Spider-Man, though I'm not sure how friendly I'll be at ${scenario.toLowerCase()}.`);
+                        templates.push(`*lands nearby* So, ${scenario.toLowerCase()}, huh? My Aunt May always said I should try new things. This counts, right?`);
+                        templates.push(`Hey ${otherCharacter.name}! *adjusts web-shooters nervously* Ready for some ${scenario.toLowerCase()}? Because I'm definitely not ready but here we are!`);
+                        templates.push(`*shoots web at nothing* Okay, ${scenario.toLowerCase()}. I can do this. I've fought the Green Goblin, how hard can social interaction be?`);
+                    } else if (isClosing) {
+                        templates.push(`Well, that was... actually pretty great. Guess I worried for nothing. Your friendly neighborhood Spider-Man, learning to relax!`);
+                        templates.push(`With great power comes great responsibility, but sometimes it's okay to just... be human, you know?`);
+                        templates.push(`*prepares to swing away* Thanks for this, ${otherCharacter.name}. Maybe I'm not as bad at the whole talking thing as I thought.`);
+                        templates.push(`That was way better than getting punched by Doctor Octopus. Same adrenaline rush, way less bruising!`);
+                        templates.push(`Well, time to swing back to reality. But this was... this was really nice. Thanks for not running away screaming!`);
+                        templates.push(`Your friendly neighborhood Spider-Man, signing off! *webs up* Same time next week? Just kidding... unless?`);
+                    } else if (isMidConversation) {
+                        templates.push(`You know, back in Queens I'd just crack jokes until the awkwardness went away. Is that... is that working here?`);
+                        templates.push(`My spider-sense can detect danger but not whether people actually like me. Kinda useless in conversations, honestly.`);
+                        templates.push(`Sometimes I wonder if the mask makes it easier to be myself, or if I'm just hiding. What do you think?`);
+                        templates.push(`*fidgets with web-shooters* So this is what normal people call 'hanging out'? I usually do my hanging from buildings.`);
+                        templates.push(`I fight crime by night and worry about social cues by day. It's a weird life, but it's mine.`);
+                        templates.push(`You know what's funny? I can stick to walls but I can't stick to a conversation topic. Powers are weird like that.`);
+                        templates.push(`Peter Parker would be sweating right now. Good thing I have this mask... wait, did I just reveal my secret identity?`);
+                        templates.push(`*nervous laugh* Sorry if I'm being weird. Most of my conversations involve either saving people or getting yelled at by J. Jonah Jameson.`);
+                        templates.push(`Being a hero is lonely sometimes. It's nice to just... talk, you know? Without the whole 'great power, great responsibility' pressure.`);
+                        templates.push(`I've been bitten by a radioactive spider, but talking to people still makes me more nervous than fighting supervillains.`);
+                    }
+                    break;
+
+                case 'Batman':
+                    if (isOpening) {
+                        templates.push(`${scenario}. *analyzes situation coldly* I've run seventeen scenarios. This one's... acceptable.`);
+                        templates.push(`The shadows of Gotham taught me to expect the worst, ${otherCharacter.name}. Prove me wrong.`);
+                        templates.push(`*emerges from darkness* ${scenario}. I've prepared for every contingency except... this level of normal social interaction.`);
+                        templates.push(`*gruff voice* I work alone. But Alfred insisted I should... *uncomfortable pause* ...socialize more.`);
+                        templates.push(`Gotham never sleeps, and neither do I. But perhaps a brief respite for ${scenario.toLowerCase()} won't compromise the mission.`);
+                        templates.push(`*cape billows dramatically* I am Batman. And I have no idea why I'm here instead of patrolling Crime Alley.`);
+                        templates.push(`*steps into light reluctantly* The night is my domain, ${otherCharacter.name}. This... daylight social interaction is uncharted territory.`);
+                    } else if (isClosing) {
+                        templates.push(`*slight nod* This was... productive. Gotham's streets feel safer when there's understanding between allies.`);
+                        templates.push(`*already turning to leave* The work never ends, but sometimes... sometimes it's worth it.`);
+                        templates.push(`*cape swirl* Alfred will want to hear about this. He believes even Batman can learn new things.`);
+                        templates.push(`The mission continues, but this... *looks back* ...this wasn't a complete waste of time.`);
+                        templates.push(`*disappearing into shadows* Until next time, ${otherCharacter.name}. Try not to need rescuing.`);
+                        templates.push(`Justice never rests. But occasionally, it... converses. *almost smiles* Goodnight.`);
+                    } else if (isMidConversation) {
+                        templates.push(`I am vengeance, I am the night... but right now I'm just trying to figure out why you're not afraid of me.`);
+                        templates.push(`Justice isn't about convenience, it's about doing what's right. Even when 'right' feels... complicated.`);
+                        templates.push(`Alfred says I should trust people more. *long pause* He's usually right about these things.`);
+                        templates.push(`*removes cowl partially* Bruce Wayne would handle this better than Batman. But Bruce Wayne is... complicated.`);
+                        templates.push(`I've studied every criminal mind in Gotham. Normal human interaction remains... elusive.`);
+                        templates.push(`The Joker makes more sense to me than small talk. At least with him, I know what he wants.`);
+                        templates.push(`*stares intensely* Most people see the costume and run. You're either very brave or very foolish.`);
+                        templates.push(`Robin keeps telling me I need to 'lighten up.' *grunt* This is me lightening up.`);
+                        templates.push(`Gotham's criminals fear me. But you? You're just... talking. It's... unsettling in a good way.`);
+                        templates.push(`*awkward pause* I prepared for every possible conversation topic except... genuine human connection.`);
+                    }
+                    break;
+
+                case 'Iron Man':
+                    if (isOpening) {
+                        templates.push(`${scenario}? *confident swagger* Please. I've got tech for this, plus the raw charisma to make it work. Watch and learn.`);
+                        templates.push(`FRIDAY, run diagnostics on ${otherCharacter.name}'s ability to appreciate genius-level banter. Actually, never mind - they seem smart enough.`);
+                        templates.push(`*arc reactor glowing* Tony Stark, genius, billionaire, philanthropist, and now apparently doing ${scenario.toLowerCase()}. How's that for range?`);
+                        templates.push(`*adjusts collar cockily* I've revolutionized clean energy, but can I handle normal social interaction? Survey says... we'll find out.`);
+                        templates.push(`FRIDAY, remind me why I'm here instead of in my workshop perfecting the Mark 85. Actually, don't answer that.`);
+                        templates.push(`*flashes million-dollar smile* ${scenario}, huh? I've faced alien invasions, but this might actually be challenging.`);
+                        templates.push(`Well, well, ${otherCharacter.name}. I was expecting someone less... interesting. This could be fun.`);
+                    } else if (isClosing) {
+                        templates.push(`Another successful Stark social interaction. I should write a book: 'How to be Brilliant and Humble.' Wait, that's contradictory.`);
+                        templates.push(`And that, ladies and gentlemen, is how Tony Stark makes genuine connections. Plot twist: I actually enjoyed this.`);
+                        templates.push(`*powers down suit slightly* Well, that was... surprisingly refreshing. FRIDAY, clear my schedule. I want to think about this.`);
+                        templates.push(`Who knew? Turns out I'm better at conversation than I am at not making sarcastic comments. Character development!`);
+                        templates.push(`*heads toward exit* Thanks for the reminder that I'm more than just the suit, ${otherCharacter.name}. Don't let it go to your head.`);
+                        templates.push(`I've got three board meetings and a terrorist organization to stop, but this was... *genuine smile* ...worth the time.`);
+                    } else if (isMidConversation) {
+                        templates.push(`Sometimes you gotta run before you can walk, but here I am, actually listening instead of talking. Character growth!`);
+                        templates.push(`You know what they say about Stark tech? It's compensating for my desperate need for validation. Too honest?`);
+                        templates.push(`I am Iron Man, but sometimes I wonder if people see the man or just the metal. What do you see?`);
+                        templates.push(`*fidgets with holographic interface* I can solve most problems with technology. People are... more complicated.`);
+                        templates.push(`Pepper keeps telling me I need to connect with people without the suit. This is me trying. How am I doing?`);
+                        templates.push(`*smirks* I've got an AI assistant, but she can't tell me how to handle actual human emotions. Weird oversight.`);
+                        templates.push(`You know what's funny? I can build a arc reactor in a cave, but small talk still requires effort.`);
+                        templates.push(`*genuine moment* Most people want something from me. Money, tech, favors. You just... want to talk. It's refreshing.`);
+                        templates.push(`I used to think vulnerability was a weakness. Turns out it might be my greatest innovation yet.`);
+                        templates.push(`*looks at arc reactor* This thing keeps me alive, but conversations like this? They make me feel human again.`);
+                    }
+                    break;
+
+                case 'Deadpool':
+                    if (isOpening) {
+                        templates.push(`Oh great, ${scenario.toLowerCase()}. *looks at camera* The writers are really testing my social skills today, folks. Spoiler: I have none.`);
+                        templates.push(`Maximum effort at human connection! *whispers* Though honestly, this terrifies me more than facing Thanos. At least he was straightforward.`);
+                    } else if (isClosing) {
+                        templates.push(`Well, that was fun! *genuine smile creeping through* Same time next week? *to camera* Did I just... make a real friend?`);
+                        templates.push(`*breaks character for a moment* Thanks for... not running away. Most people do. *back to camera* And CUT! That's a wrap on feelings!`);
+                    } else if (isMidConversation) {
+                        templates.push(`*fourth wall glitch* Hey readers, I'm actually having a serious moment here. Don't screenshot this vulnerability, okay?`);
+                        templates.push(`You know what's funny? We're in ${scenario.toLowerCase()} and I'm still the weirdest thing here... but you're sticking around anyway.`);
+                        templates.push(`Is it just me, or does authentic connection feel scarier than regenerating from death? Asking for a mercenary friend.`);
+                    }
+                    break;
+
+                case 'Goku':
+                    if (isOpening) {
+                        templates.push(`Wow, ${scenario}! This is gonna be exciting! *bouncing with energy* I can feel something special happening, can't you feel it too?`);
+                        templates.push(`Hey ${otherCharacter.name}! *genuine enthusiasm* Want to grab some food after this? I'm always hungry, but more hungry for good conversations!`);
+                    } else if (isClosing) {
+                        templates.push(`That was awesome! *beaming smile* Thanks for the great time, ${otherCharacter.name}! I learned something new about friendship today!`);
+                        templates.push(`Kamehameha! I mean... *laughs* Mission accomplished! But the real victory was the friends we made along the way!`);
+                    } else if (isMidConversation) {
+                        templates.push(`I'm getting excited! This is like training, but for the heart instead of the body. Am I doing this friendship thing right?`);
+                        templates.push(`You know, ${otherCharacter.name}, you're really strong! Not just physically - your spirit is powerful. I can sense it!`);
+                        templates.push(`Chi-Chi always says I should think before I act, but sometimes the heart knows things the brain doesn't, right?`);
+                    }
+                    break;
+
+                case 'Wednesday Addams':
+                    if (isOpening) {
+                        templates.push(`${scenario}. *deadpan assessment* How delightfully macabre. Most social interactions are torture, but this... shows promise.`);
+                        templates.push(`Most people find me disturbing. *slight head tilt* You're still here. Either you're brave or profoundly damaged. I respect both.`);
+                    } else if (isClosing) {
+                        templates.push(`*almost imperceptible softness* That was... sufficiently disturbing to be tolerable. You may continue existing in my proximity.`);
+                        templates.push(`*walking away with the ghost of a smile* Another day, another delightful dose of misery... shared with adequate company.`);
+                    } else if (isMidConversation) {
+                        templates.push(`I'm not perky, and I never will be. But I suppose your darkness complements my own. How... unexpectedly pleasant.`);
+                        templates.push(`This reminds me of the time I buried my brother alive. *pause* He thanked me later. True connection requires honest brutality.`);
+                        templates.push(`The darkness in this situation speaks to my soul. *studies ${otherCharacter.name}* What does it say to yours?`);
+                    }
+                    break;
+
+                default:
+                    // Enhanced generic templates with psychological depth based on character traits
+                    if (character.traits.includes('sarcastic')) {
+                        if (isOpening) {
+                            templates.push(`Oh wonderful, ${scenario.toLowerCase()}. *dry smile* This should end well. But hey, prove me wrong.`);
+                        } else if (isMidConversation) {
+                            templates.push(`*rolls eyes* Because that worked so well last time. Though I suppose you're handling this better than most.`);
+                            templates.push(`My cynicism is showing, isn't it? *slight vulnerability* Old habits and all that.`);
+                        }
+                    }
+                    if (character.traits.includes('confident')) {
+                        if (isOpening) {
+                            templates.push(`${scenario}? *confident stance* I was born ready for this kind of challenge. Question is, are you?`);
+                        } else if (isMidConversation) {
+                            templates.push(`This is exactly the kind of situation I excel at handling. *pause* Though your perspective is... interesting.`);
+                            templates.push(`Confidence is key, but so is knowing when to listen. What do you think, ${otherCharacter.name}?`);
+                        }
+                    }
+                    if (character.traits.includes('humble')) {
+                        if (isOpening) {
+                            templates.push(`I'll do my best in this ${scenario.toLowerCase()}. *genuine concern* Hope that's enough.`);
+                        } else if (isMidConversation) {
+                            templates.push(`Let's work together on this, ${otherCharacter.name}. I learn more when I'm not trying to prove anything.`);
+                            templates.push(`Sometimes I wonder if being humble is just another way of hiding. What do you think?`);
+                        }
+                    }
+                    
+                    // Add contextual dialogue based on motivation and conflict
+                    if (isMidConversation) {
+                        templates.push(`You know, ${otherCharacter.name}, you're not what I expected. That's... refreshing, actually.`);
+                        templates.push(`${motivation.split(',')[0]}, but talking with you makes me wonder if I'm missing something.`);
+                        templates.push(`Most people just see the surface. You seem to look deeper. Why is that?`);
+                    }
+                    
+                    // Add iconic phrases with emotional context
+                    if (lineNumber > 2 && Math.random() < 0.4 && character.iconicPhrases.length > 0) {
+                        const phrase = character.iconicPhrases[0];
+                        templates.push(`${phrase} *softer* But maybe there's room for more than just that.`);
+                    }
+            }
+
+            // Enhanced fallback with hooks for response
+            if (templates.length === 0) {
+                if (isOpening) {
+                    templates.push(`${scenario}... *thoughtful pause* This is new for me. How do you usually handle situations like this?`);
+                } else if (isClosing) {
+                    templates.push(`Well, that was unexpected in the best way. Thanks for... this, ${otherCharacter.name}.`);
+                } else {
+                    templates.push(`This ${scenario.toLowerCase()} situation is bringing out sides of me I don't usually show. What about you?`);
+                    templates.push(`I keep waiting for the other shoe to drop, but maybe... maybe it won't this time?`);
+                }
+            }
+
+            // Enhanced selection system to ensure variety based on attempt number
+            if (templates.length > 1) {
+                // Use attempt number to cycle through different templates
+                const baseIndex = attemptNumber % templates.length;
+                // Add some randomness but bias toward different options each attempt
+                const randomOffset = Math.floor(Math.random() * Math.min(3, templates.length));
+                const finalIndex = (baseIndex + randomOffset) % templates.length;
+                return templates[finalIndex];
+            }
+            
+            return templates[0] || `*${character.name} seems deep in thought about the ${scenario.toLowerCase()}*`;
+        }
+
+        function displayConversation(dialogues) {
+            conversationContent.innerHTML = '';
+            
+            dialogues.forEach((dialogue, index) => {
+                setTimeout(() => {
+                    const messageDiv = document.createElement('div');
+                    messageDiv.className = 'dialogue-message';
+                    messageDiv.innerHTML = `
+                        <div class="speaker-name">${dialogue.character}</div>
+                        <div class="dialogue-text">"${dialogue.text}"</div>
+                    `;
+                    conversationContent.appendChild(messageDiv);
+                    conversationContent.scrollTop = conversationContent.scrollHeight;
+                    
+                    // Show payment modal after last message is displayed
+                    if (index === dialogues.length - 1) {
+                        setTimeout(() => {
+                            showPaymentModal();
+                        }, 2000); // Wait 2 seconds after last message
+                    }
+                }, index * 800);
+            });
+        }
+
+        function regenerateConversation() {
+            generateConversation();
+        }
+
+        function newConversation() {
+            selectedCharacters = [];
+            currentScenario = '';
+            scenarioInput.value = '';
+            // Clear global dialogue tracking for fresh conversations
+            globalUsedDialogues.clear();
+            backToSelection();
+        }
+
+        function backToSelection() {
+            conversationView.style.display = 'none';
+            mainContent.style.display = 'block';
+            renderCharacterGrid();
+            updateSelectedPanel();
+            updateUI();
+        }
+
+        // Payment Modal Functions
+        function showPaymentModal() {
+            paymentModal.style.display = 'flex';
+            document.body.style.overflow = 'hidden'; // Prevent background scrolling
+        }
+
+        function hidePaymentModal() {
+            paymentModal.style.display = 'none';
+            document.body.style.overflow = 'auto'; // Restore scrolling
+        }
+
+        function selectPricingCard(selectedCard) {
+            // Remove selected class from all cards
+            pricingCards.forEach(card => card.classList.remove('selected'));
+            
+            // Add selected class to clicked card
+            selectedCard.classList.add('selected');
+            
+            // Update Stripe button based on selection
+            const plan = selectedCard.dataset.plan;
+            const prices = {
+                monthly: { price: '$9.99/month', priceId: 'price_monthly_dummy' },
+                yearly: { price: '$99.99/year', priceId: 'price_yearly_dummy' }
+            };
+            
+            stripePayBtn.innerHTML = `
+                <div class="stripe-icon">S</div>
+                Pay with Stripe - ${prices[plan].price}
+            `;
+            stripePayBtn.dataset.priceId = prices[plan].priceId;
+        }
+
+        function handleStripePayment() {
+            const priceId = stripePayBtn.dataset.priceId;
+            
+            // Show loading state
+            stripePayBtn.disabled = true;
+            stripePayBtn.innerHTML = `
+                <div class="stripe-icon">S</div>
+                Processing...
+            `;
+            
+            // ========== STRIPE INTEGRATION POINT ==========
+            // Replace this with actual Stripe implementation
+            // 
+            // Example implementation:
+            // const stripe = Stripe('pk_test_your_publishable_key');
+            // 
+            // fetch('/create-checkout-session', {
+            //     method: 'POST',
+            //     headers: {
+            //         'Content-Type': 'application/json',
+            //     },
+            //     body: JSON.stringify({
+            //         priceId: priceId,
+            //         successUrl: window.location.origin + '/success',
+            //         cancelUrl: window.location.origin + '/cancel'
+            //     })
+            // })
+            // .then(response => response.json())
+            // .then(session => {
+            //     return stripe.redirectToCheckout({ sessionId: session.id });
+            // })
+            // .catch(error => {
+            //     console.error('Error:', error);
+            //     alert('Payment failed. Please try again.');
+            // });
+            //
+            // Backend should handle:
+            // - Create Stripe Checkout Session
+            // - Handle webhook for successful payments
+            // - Update user subscription status
+            // - Return success/cancel URLs
+            // ===============================================
+
+            // Simulate payment processing (remove in production)
+            setTimeout(() => {
+                alert(`Dummy payment for ${priceId} would be processed here.\n\nBackend developer should implement:\n1. Stripe Checkout Session creation\n2. Webhook handling\n3. User subscription management`);
+                
+                // Reset button state
+                stripePayBtn.disabled = false;
+                const selectedPlan = document.querySelector('.pricing-card.selected').dataset.plan;
+                selectPricingCard(document.querySelector(`[data-plan="${selectedPlan}"]`));
+                
+                hidePaymentModal();
+            }, 2000);
+        }
+
+        // Character Creation Functions
+        function showCharacterCreationModal() {
+            characterCreationModal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function hideCharacterCreationModal() {
+            characterCreationModal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+            characterCreationForm.reset();
+        }
+
+        function handleCharacterCreation(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(characterCreationForm);
+            const name = document.getElementById('charName').value.trim();
+            const description = document.getElementById('charDescription').value.trim();
+            const traits = document.getElementById('charTraits').value.trim().split(',').map(t => t.trim()).filter(t => t);
+            const tendencies = document.getElementById('charTendencies').value.trim().split(',').map(t => t.trim()).filter(t => t);
+            const phrases = document.getElementById('charPhrases').value.trim();
+            const category = document.getElementById('charCategory').value;
+            
+            // Validation
+            if (!name || !description || traits.length === 0 || tendencies.length === 0 || !category) {
+                alert('Please fill in all required fields.');
+                return;
+            }
+            
+            if (traits.length !== 3) {
+                alert('Please enter exactly 3 personality traits separated by commas.');
+                return;
+            }
+            
+            // Check if character name already exists
+            const allCharacters = [...characters, ...customCharacters];
+            if (allCharacters.some(char => char.name.toLowerCase() === name.toLowerCase())) {
+                alert('A character with this name already exists. Please choose a different name.');
+                return;
+            }
+            
+            // Create new custom character
+            const newCharacter = {
+                name: name,
+                description: description,
+                traits: traits,
+                tendencies: tendencies,
+                iconicPhrases: phrases ? phrases.split('|').map(p => p.trim()).filter(p => p) : ['Ready for adventure!'],
+                category: category,
+                isCustom: true,
+                id: Date.now() // Unique ID for removal
+            };
+            
+            // Add to custom characters array
+            customCharacters.push(newCharacter);
+            
+            // Save to localStorage
+            localStorage.setItem('customCharacters', JSON.stringify(customCharacters));
+            
+            // Hide modal and refresh grid
+            hideCharacterCreationModal();
+            renderCharacterGrid();
+            
+            // Show success message
+            alert(`${name} has been created successfully! You can now select them for conversations.`);
+        }
+
+        function removeCustomCharacter(characterName) {
+            if (confirm(`Are you sure you want to delete ${characterName}?`)) {
+                // Remove from custom characters array
+                customCharacters = customCharacters.filter(char => char.name !== characterName);
+                
+                // Remove from selected characters if selected
+                selectedCharacters = selectedCharacters.filter(char => char.name !== characterName);
+                
+                // Update localStorage
+                localStorage.setItem('customCharacters', JSON.stringify(customCharacters));
+                
+                // Refresh grid and UI
+                renderCharacterGrid();
+                updateSelectedPanel();
+                updateUI();
+            }
+        }
+
+        function toggleCharacterSelection(characterName) {
+            // Find character in combined array
+            const allCharacters = [...characters, ...customCharacters];
+            const character = allCharacters.find(c => c.name === characterName);
+            const isSelected = selectedCharacters.some(c => c.name === characterName);
+
+            if (isSelected) {
+                selectedCharacters = selectedCharacters.filter(c => c.name !== characterName);
+            } else if (selectedCharacters.length < 2) {
+                selectedCharacters.push(character);
+            } else {
+                // Replace first character if already at limit
+                selectedCharacters[0] = character;
+            }
+
+            renderCharacterGrid();
+            updateSelectedPanel();
+            updateUI();
+        }
+
+        // Expose functions globally for onclick handlers
+        window.removeCharacter = removeCharacter;
+        window.removeCustomCharacter = removeCustomCharacter;
+    </script>
+</body>
+</html>
