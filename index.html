@@ -235,7 +235,7 @@
             border-radius: 20px;
             padding: 1.5rem;
             cursor: pointer;
-            transition: all 0.4s ease;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             backdrop-filter: blur(15px);
             position: relative;
             overflow: hidden;
@@ -243,29 +243,58 @@
             flex-direction: column;
             align-items: center;
             text-align: center;
+            animation: cardFadeIn 0.6s ease forwards;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        .character-card:nth-child(odd) {
+            animation-delay: 0.1s;
+        }
+
+        .character-card:nth-child(even) {
+            animation-delay: 0.2s;
+        }
+
+        @keyframes cardFadeIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .character-image {
-            width: 80px;
-            height: 80px;
+            width: 100px;
+            height: 100px;
             border-radius: 50%;
             object-fit: cover;
             margin-bottom: 1rem;
             border: 3px solid var(--glass-border);
-            transition: all 0.3s ease;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
             z-index: 1;
+            background: linear-gradient(45deg, var(--dark-purple-grey), var(--deep-black));
+        }
+
+        .character-image.loading {
+            animation: imagePulse 1.5s ease-in-out infinite alternate;
+        }
+
+        @keyframes imagePulse {
+            from { opacity: 0.6; }
+            to { opacity: 1; }
         }
 
         .character-card:hover .character-image {
             border-color: var(--matrix-green);
-            box-shadow: 0 0 20px rgba(0, 255, 65, 0.4);
-            transform: scale(1.1);
+            box-shadow: 0 0 30px rgba(0, 255, 65, 0.6);
+            transform: scale(1.15) rotate(5deg);
         }
 
         .character-card.selected .character-image {
             border-color: var(--hot-pink);
-            box-shadow: 0 0 25px rgba(255, 20, 147, 0.6);
+            box-shadow: 0 0 35px rgba(255, 20, 147, 0.8);
+            transform: scale(1.1);
         }
 
         .character-card::before {
@@ -277,27 +306,119 @@
             bottom: 0;
             background: linear-gradient(135deg, var(--hot-pink), var(--matrix-green));
             opacity: 0;
-            transition: opacity 0.3s ease;
+            transition: all 0.4s ease;
             z-index: -1;
+            border-radius: 20px;
+        }
+
+        .character-card::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transform: rotate(45deg) translateX(-100%);
+            transition: transform 0.6s ease;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .character-card:hover::after {
+            transform: rotate(45deg) translateX(100%);
         }
 
         .character-card:hover {
-            transform: translateY(-10px) scale(1.02);
-            box-shadow: 0 20px 40px rgba(255, 20, 147, 0.3);
+            transform: translateY(-15px) scale(1.03);
+            box-shadow: 0 25px 50px rgba(255, 20, 147, 0.4);
+            border-color: var(--matrix-green);
         }
 
         .character-card:hover::before {
-            opacity: 0.1;
+            opacity: 0.15;
         }
 
         .character-card.selected {
-            background: rgba(255, 20, 147, 0.2);
+            background: rgba(255, 20, 147, 0.25);
             border: 2px solid var(--hot-pink);
-            box-shadow: 0 0 30px rgba(255, 20, 147, 0.5);
+            box-shadow: 0 0 40px rgba(255, 20, 147, 0.6);
+            transform: scale(1.02);
         }
 
         .character-card.selected::before {
-            opacity: 0.15;
+            opacity: 0.2;
+        }
+
+        /* Character Preview Tooltip */
+        .character-preview {
+            position: absolute;
+            top: -100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 15px;
+            padding: 1rem;
+            backdrop-filter: blur(20px);
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s ease;
+            min-width: 250px;
+            text-align: left;
+        }
+
+        .character-card:hover .character-preview {
+            opacity: 1;
+            transform: translateX(-50%) translateY(-10px);
+        }
+
+        .preview-stat {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+            font-size: 0.85rem;
+        }
+
+        .stat-label {
+            color: var(--matrix-green);
+            font-weight: 600;
+        }
+
+        .stat-value {
+            color: white;
+        }
+
+        /* Enhanced Trait Tags */
+        .trait-tag {
+            background: linear-gradient(45deg, rgba(255, 20, 147, 0.3), rgba(0, 255, 65, 0.3));
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.75rem;
+            border: 1px solid var(--glass-border);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .trait-tag:hover {
+            background: linear-gradient(45deg, rgba(255, 20, 147, 0.5), rgba(0, 255, 65, 0.5));
+            transform: scale(1.05);
+        }
+
+        /* Usage Stats */
+        .character-stats {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 10px;
+            padding: 0.3rem 0.6rem;
+            font-size: 0.7rem;
+            color: var(--matrix-green);
+            z-index: 2;
         }
 
         .character-name {
@@ -496,6 +617,149 @@
             color: var(--matrix-green);
             font-size: 0.9rem;
             opacity: 0.8;
+        }
+
+        /* Loading States & Animations */
+        .skeleton-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 1.5rem;
+            backdrop-filter: blur(10px);
+            animation: pulse 1.5s ease-in-out infinite alternate;
+        }
+
+        .skeleton-image {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(90deg, 
+                rgba(46, 46, 62, 0.3) 25%, 
+                rgba(0, 255, 65, 0.1) 50%, 
+                rgba(46, 46, 62, 0.3) 75%);
+            background-size: 200% 100%;
+            animation: shimmer 2s infinite;
+            border-radius: 15px;
+            margin-bottom: 1rem;
+        }
+
+        .skeleton-text {
+            height: 1rem;
+            background: linear-gradient(90deg, 
+                rgba(46, 46, 62, 0.3) 25%, 
+                rgba(0, 255, 65, 0.1) 50%, 
+                rgba(46, 46, 62, 0.3) 75%);
+            background-size: 200% 100%;
+            animation: shimmer 2s infinite;
+            border-radius: 5px;
+            margin-bottom: 0.5rem;
+        }
+
+        .skeleton-text.short {
+            width: 60%;
+        }
+
+        .skeleton-text.medium {
+            width: 80%;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.6; }
+            100% { opacity: 1; }
+        }
+
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+
+        /* Loading Spinner */
+        .loading-spinner {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 10000;
+            background: var(--glass-bg);
+            padding: 2rem;
+            border-radius: 20px;
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(20px);
+            text-align: center;
+        }
+
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid rgba(0, 255, 65, 0.3);
+            border-top: 4px solid var(--matrix-green);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        .loading-text {
+            color: var(--matrix-green);
+            font-weight: 600;
+            animation: pulse 1.5s ease-in-out infinite alternate;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Enhanced Typography Hierarchy */
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(45deg, var(--hot-pink), var(--matrix-green));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-align: center;
+        }
+
+        .section-subtitle {
+            font-size: 1.1rem;
+            opacity: 0.8;
+            text-align: center;
+            margin-bottom: 2rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            line-height: 1.6;
+        }
+
+        /* Breadcrumb Navigation */
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            padding: 0 2rem;
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .breadcrumb-item {
+            color: var(--matrix-green);
+            text-decoration: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .breadcrumb-item:hover {
+            opacity: 1;
+        }
+
+        .breadcrumb-separator {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .breadcrumb-current {
+            color: white;
+            font-weight: 600;
         }
 
         .tone-buttons {
@@ -1161,11 +1425,25 @@
     </header>
 
     <!-- Main Content -->
+    <!-- Loading Spinner -->
+    <div class="loading-spinner" id="loadingSpinner">
+        <div class="spinner"></div>
+        <div class="loading-text">Generating conversation...</div>
+    </div>
+
     <main class="main-content" id="mainContent">
+        <!-- Breadcrumb Navigation -->
+        <nav class="breadcrumb" id="breadcrumb">
+            <a href="#" class="breadcrumb-item" onclick="showMainView()">Home</a>
+            <span class="breadcrumb-separator">›</span>
+            <span class="breadcrumb-current">Character Selection</span>
+        </nav>
+
         <div class="intro-section">
-            <h1 class="main-title">Legends Don't Just Live in Stories Anymore.</h1>
-            <p class="subtitle">
-                They talk, they argue, they team up—exactly how you'd expect… or maybe not.
+            <h1 class="section-title">Legends Don't Just Live in Stories Anymore.</h1>
+            <p class="section-subtitle">
+                They talk, they argue, they team up—exactly how you'd expect… or maybe not. 
+                Select your characters and watch iconic personalities come to life in unexpected conversations.
             </p>
             <button class="cta-button" onclick="document.querySelector('.character-grid').scrollIntoView({behavior: 'smooth'})">
                 See It Happen
@@ -1194,10 +1472,40 @@
             <div class="search-results-count" id="searchResultsCount"></div>
         </div>
 
-        <!-- Character Grid -->
-        <div class="character-grid" id="characterGrid">
-            <!-- Characters will be populated by JavaScript -->
-        </div>
+        <!-- Character Selection Section -->
+        <section class="character-selection-section">
+            <h2 class="section-title">Choose Your Characters</h2>
+            <p class="section-subtitle">Select 2-4 characters to create an epic conversation between legends</p>
+            
+            <!-- Character Grid -->
+            <div class="character-grid" id="characterGrid">
+                <!-- Skeleton loading cards will be shown initially -->
+                <div class="skeleton-card">
+                    <div class="skeleton-image"></div>
+                    <div class="skeleton-text"></div>
+                    <div class="skeleton-text short"></div>
+                    <div class="skeleton-text medium"></div>
+                </div>
+                <div class="skeleton-card">
+                    <div class="skeleton-image"></div>
+                    <div class="skeleton-text"></div>
+                    <div class="skeleton-text short"></div>
+                    <div class="skeleton-text medium"></div>
+                </div>
+                <div class="skeleton-card">
+                    <div class="skeleton-image"></div>
+                    <div class="skeleton-text"></div>
+                    <div class="skeleton-text short"></div>
+                    <div class="skeleton-text medium"></div>
+                </div>
+                <div class="skeleton-card">
+                    <div class="skeleton-image"></div>
+                    <div class="skeleton-text"></div>
+                    <div class="skeleton-text short"></div>
+                    <div class="skeleton-text medium"></div>
+                </div>
+            </div>
+        </section>
     </main>
 
     <!-- Selected Characters Panel -->
@@ -1892,6 +2200,9 @@
         
         // Global dialogue tracking to prevent repetition across conversations
         let globalUsedDialogues = new Map();
+        
+        // Character usage tracking
+        let characterUsageStats = JSON.parse(localStorage.getItem('characterUsageStats') || '{}');
 
         // DOM Elements
         const selectionCount = document.getElementById('selectionCount');
@@ -1921,8 +2232,12 @@
         // Initialize App
         document.addEventListener('DOMContentLoaded', function() {
             setupEventListeners();
-            renderCharacterGrid();
-            updateUI();
+            
+            // Show skeleton loading initially, then load characters after a brief delay
+            setTimeout(() => {
+                renderCharacterGrid();
+                updateUI();
+            }, 500);
         });
 
         function setupEventListeners() {
@@ -2032,22 +2347,62 @@
             // Sort characters alphabetically by name
             filteredCharacters = filteredCharacters.sort((a, b) => a.name.localeCompare(b.name));
 
-            characterGrid.innerHTML = filteredCharacters.map(character => `
-                <div class="character-card ${character.isCustom ? 'custom-character' : ''} ${selectedCharacters.some(c => c.name === character.name) ? 'selected' : ''}" 
-                     data-character="${character.name}">
+            // Show skeleton loading initially
+            if (filteredCharacters.length === 0 && !searchTerm) {
+                return; // Keep skeleton cards visible
+            }
+
+            characterGrid.innerHTML = filteredCharacters.map((character, index) => {
+                const usageCount = getCharacterUsage(character.name);
+                const isSelected = selectedCharacters.some(c => c.name === character.name);
+                
+                return `
+                <div class="character-card ${character.isCustom ? 'custom-character' : ''} ${isSelected ? 'selected' : ''}" 
+                     data-character="${character.name}" 
+                     style="animation-delay: ${index * 0.1}s">
+                    
+                    ${!character.isCustom ? `<div class="character-stats">Used ${usageCount}x</div>` : ''}
+                    
                     ${character.isCustom ? 
                         `<div class="custom-character-placeholder">${character.name.charAt(0).toUpperCase()}</div>` :
-                        `<img src="${character.image}" alt="${character.name}" class="character-image" onerror="this.style.display='none'">`
+                        `<img src="${character.image}" 
+                             alt="${character.name}" 
+                             class="character-image loading" 
+                             onload="this.classList.remove('loading')"
+                             onerror="this.style.display='none'; this.classList.remove('loading')">`
                     }
+                    
                     <div class="character-name">${character.name}</div>
                     <div class="character-description">${character.description}</div>
                     <div class="character-traits">
                         ${character.traits.map(trait => `<span class="trait-tag">${trait}</span>`).join('')}
                     </div>
                     <div class="character-phrase">"${character.iconicPhrases[0] || 'Ready for adventure!'}"</div>
+                    
+                    <!-- Character Preview Tooltip -->
+                    <div class="character-preview">
+                        <div class="preview-stat">
+                            <span class="stat-label">Category:</span>
+                            <span class="stat-value">${character.category}</span>
+                        </div>
+                        <div class="preview-stat">
+                            <span class="stat-label">Personality:</span>
+                            <span class="stat-value">${character.traits.slice(0, 2).join(', ')}</span>
+                        </div>
+                        <div class="preview-stat">
+                            <span class="stat-label">Usage:</span>
+                            <span class="stat-value">${usageCount} conversations</span>
+                        </div>
+                        <div class="preview-stat">
+                            <span class="stat-label">Iconic:</span>
+                            <span class="stat-value">"${character.iconicPhrases[0]?.slice(0, 30)}..."</span>
+                        </div>
+                    </div>
+                    
                     ${character.isCustom ? '<button class="remove-custom-char" onclick="removeCustomCharacter(\'' + character.name + '\')">✕</button>' : ''}
                 </div>
-            `).join('');
+                `;
+            }).join('');
 
             // Add click listeners
             document.querySelectorAll('.character-card').forEach(card => {
@@ -2098,10 +2453,21 @@
         function startConversation() {
             if (selectedCharacters.length !== 2 || !currentScenario.trim()) return;
 
+            // Track character usage
+            selectedCharacters.forEach(char => {
+                incrementCharacterUsage(char.name);
+            });
+
+            // Show loading spinner
+            showLoadingSpinner('Generating epic conversation...');
+
             // Show conversation view
             mainContent.style.display = 'none';
             conversationView.style.display = 'block';
             selectedPanel.classList.remove('active');
+
+            // Update breadcrumb
+            updateBreadcrumb('Conversation');
 
             // Update participants display
             conversationParticipants.innerHTML = selectedCharacters.map(char => `
@@ -2116,8 +2482,8 @@
         }
 
         async function generateConversation() {
-            loadingAnimation.style.display = 'block';
             conversationContent.innerHTML = '';
+            showLoadingSpinner('Crafting the perfect dialogue...');
 
             try {
                 // Generate AI dialogue with Groq
@@ -2128,7 +2494,7 @@
                     selectedTone
                 );
 
-                loadingAnimation.style.display = 'none';
+                hideLoadingSpinner();
                 
                 if (dialogue && dialogue.length > 0) {
                     displayConversation(dialogue);
@@ -2149,7 +2515,7 @@
                     `;
                 }
             } catch (error) {
-                loadingAnimation.style.display = 'none';
+                hideLoadingSpinner();
                 console.error('Conversation generation error:', error);
                 
                 conversationContent.innerHTML = `
@@ -2873,6 +3239,46 @@ Start the conversation now!
                 updateSelectedPanel();
                 updateUI();
             }
+        }
+
+        // Character usage tracking functions
+        function getCharacterUsage(characterName) {
+            return characterUsageStats[characterName] || 0;
+        }
+
+        function incrementCharacterUsage(characterName) {
+            characterUsageStats[characterName] = (characterUsageStats[characterName] || 0) + 1;
+            localStorage.setItem('characterUsageStats', JSON.stringify(characterUsageStats));
+        }
+
+        // Loading spinner controls
+        function showLoadingSpinner(text = 'Generating conversation...') {
+            const spinner = document.getElementById('loadingSpinner');
+            const loadingText = spinner.querySelector('.loading-text');
+            loadingText.textContent = text;
+            spinner.style.display = 'block';
+        }
+
+        function hideLoadingSpinner() {
+            const spinner = document.getElementById('loadingSpinner');
+            spinner.style.display = 'none';
+        }
+
+        // Breadcrumb navigation
+        function updateBreadcrumb(current) {
+            const breadcrumb = document.getElementById('breadcrumb');
+            const currentElement = breadcrumb.querySelector('.breadcrumb-current');
+            currentElement.textContent = current;
+        }
+
+        function showMainView() {
+            const mainContent = document.getElementById('mainContent');
+            const conversationView = document.getElementById('conversationView');
+            
+            if (mainContent) mainContent.style.display = 'block';
+            if (conversationView) conversationView.style.display = 'none';
+            
+            updateBreadcrumb('Character Selection');
         }
 
         function updateSearchResults() {
